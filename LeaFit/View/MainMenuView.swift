@@ -9,34 +9,94 @@ import SwiftUI
 
 struct MainMenuView: View {
     
-//    private var listTanaman = tanamanTest //test data
-
+    init () {
+        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor(hex: "428D6D")]
+            let toolbarAppearance = UIToolbarAppearance()
+                toolbarAppearance.configureWithOpaqueBackground()
+                toolbarAppearance.backgroundColor = UIColor(hex: "BEDCBA")
+                UIToolbar.appearance().standardAppearance = toolbarAppearance
+                UIToolbar.appearance().scrollEdgeAppearance = toolbarAppearance
+    }
+    
+    @StateObject private var categoriesViewModel = CategoriesViewModel()
     @State var searchPlaceholder = ""
     
     var body: some View {
         NavigationView {
-                List {
-//                    ForEach (tanamanNya, id: \.self) {
-//                        country in
-//                        HStack {
-//                            Text (country)
-//                            Spacer()
-//                        }
-//                        .padding()
-//                    } // test list
+            List {
+                NavigationLink(destination: PlantListView(plants: categoriesViewModel.allPlants, title: "All Plants")) {
+                    HStack {
+                        Image(systemName: "apple.meditate")
+                        Text("All Plants")
+                            .foregroundColor(.primary)
+                            .bold()
+                        Spacer()
+                        Text("\(categoriesViewModel.allPlants.count)")
+                    }
+                    .padding(.vertical, 4)
+                    .bold()
+                    
                 }
-            .searchable(text: $searchPlaceholder)
-            .navigationBarTitle("LeaFit")
+                HStack {
+                    Image(systemName: "plus.circle")
+                        .bold()
+                    Text("Add Categories")
+                        .foregroundColor(.primary)
+                        .bold()
+                }
+                
+                Section(header: Text("My Categories")
+                    .font(.headline)
+                    .foregroundColor(.primary)) {
+                        let filtered = categoriesViewModel.filteredCategories(searchText: searchPlaceholder)
+                        
+                        if filtered.isEmpty {
+                            Text("No results found")
+                                .foregroundColor(.gray)
+                        } else {
+                            ForEach(filtered) { category in
+                                NavigationLink(destination: PlantListView(plants: category.plants, title: category.name)) {
+                                    HStack {
+                                        Image(systemName: "leaf")
+                                            .bold()
+                                        Text(category.name)
+                                            .foregroundColor(.primary)
+                                            .bold()
+                                        Spacer()
+                                        Text("\(category.plants.count)")
+                                        
+                                    }
+                                    .padding(.vertical, 4)
+                                }
+                            }
+                        }
+                    }
+            }
+            
+            .navigationTitle("LeaFit")
             .navigationBarItems(trailing: EditButton())
             .foregroundColor(Color(hex: "428D6D"))
+            
+            .searchable(text: $searchPlaceholder, placement: .navigationBarDrawer(displayMode: .automatic))
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .bottomBar) {
+                HStack{
+                    Button(action: {
+                    }) {
+                        Image(systemName: "info.circle")
+                            .foregroundStyle(Color(hex: "428D6D"))
+                    }
+                    Spacer()
+                    Button(action: {
+                    }) {
+                        Image(systemName: "camera")
+                            .foregroundStyle(Color(hex: "428D6D"))
+                    }
+                }
+            }
         }
     }
-    
-//    var tanamanNya: [String] {
-//        let lctanamanNya = listTanaman.map {$0.lowercased()}
-//        
-//        return searchPlaceholder == "" ? lctanamanNya : lctanamanNya.filter {$0.contains(searchPlaceholder.lowercased())}
-//    } // buat test data aja
 }
 
 

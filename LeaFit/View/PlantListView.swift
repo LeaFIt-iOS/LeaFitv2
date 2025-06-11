@@ -17,5 +17,12 @@ struct PlantListView: View {
             Text(plant)
         }
         .navigationTitle(title)
+        .scrollContentBackground(.hidden) // hide default list background
+        .background(Color.appBackgroundColor.ignoresSafeArea())  
     }
+    
+}
+
+#Preview {
+    PlantListView(plants: ["Monstera", "Palm"], title: "Sample Category")
 }

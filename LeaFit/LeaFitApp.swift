@@ -13,5 +13,6 @@ struct LeaFitApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: PlantCategory.self)
     }
 }

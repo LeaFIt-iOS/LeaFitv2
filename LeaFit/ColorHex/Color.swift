@@ -9,6 +9,9 @@ import Foundation
 import SwiftUI
 
 public extension Color {
+    
+    static let appBackgroundColor = Color(hex: "E1EEDF")
+    
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int = UInt64()

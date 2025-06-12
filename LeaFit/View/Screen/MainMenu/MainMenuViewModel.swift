@@ -1,4 +1,11 @@
 //
+//  MainMenuViewModel.swift
+//  LeaFit
+//
+//  Created by Yonathan Hilkia on 12/06/25.
+//
+
+//
 //  CategoriesViewModel.swift
 //  LeaFit
 //
@@ -9,26 +16,26 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-@Model
-class PlantCategory: Identifiable {
-    let id: UUID
-    var name: String
-    var plants: [String]
-    
-    init(id: UUID = UUID(), name: String, plants: [String]) {
-        self.id = id
-        self.name = name
-        self.plants = plants
-    }
-}
+//@Model
+//class PlantCategorys: Identifiable {
+//    let id: UUID
+//    var name: String
+//    var plants: [String]
+//    
+//    init(id: UUID = UUID(), name: String, plants: [String]) {
+//        self.id = id
+//        self.name = name
+//        self.plants = plants
+//    }
+//}
 
 class CategoriesViewModel: ObservableObject {
     @Published private var categories: [PlantCategory] = []
     private var modelContext: ModelContext?
     
-    var allPlants: [String] {
-        categories.flatMap { $0.plants }.sorted()
-    }
+//    var allPlants: [String] {
+//        categories.flatMap { $0.plants }.sorted()
+//    }
     
     var allCategories: [PlantCategory] {
         categories
@@ -38,11 +45,13 @@ class CategoriesViewModel: ObservableObject {
         self.modelContext = context
         fetchCategories()
         
-        // Seed initial data if empty
+        //dummy data
         if categories.isEmpty {
             let initialCategories = [
-                PlantCategory(name: "Sinarmas", plants: ["Monstera", "Palm"]),
-                PlantCategory(name: "GOP9", plants: ["Abece", "Moa", "Pal"])
+                PlantCategory(name: "Aloe Vera", nameScientific: "Aloe Vera", pots: []),
+                PlantCategory(name: "Anggrek", nameScientific: "Aloe Vera2", pots: []),
+                PlantCategory(name: "Cactus", nameScientific: "Aloe Vera3", pots: [])
+
             ]
             initialCategories.forEach { category in
                 modelContext?.insert(category)
@@ -69,21 +78,21 @@ class CategoriesViewModel: ObservableObject {
         }
     }
     
-    func addCategory(name: String, plants: [String]) {
-        guard let context = modelContext else { return }
-        guard name.count <= 24 else { return }
-        guard !categoryExists(name: name) else { return }
-        
-        let newCategory = PlantCategory(name: name, plants: plants)
-        context.insert(newCategory)
-        
-        do {
-            try context.save()
-            fetchCategories()
-        } catch {
-            print("Failed to save category: \(error)")
-        }
-    }
+//    func addCategory(name: String, plants: [String]) {
+//        guard let context = modelContext else { return }
+//        guard name.count <= 24 else { return }
+//        guard !categoryExists(name: name) else { return }
+//        
+//        let newCategory = PlantCategory(name: name, plants: plants)
+//        context.insert(newCategory)
+//        
+//        do {
+//            try context.save()
+//            fetchCategories()
+//        } catch {
+//            print("Failed to save category: \(error)")
+//        }
+//    }
     
     func deleteCategory(_ category: PlantCategory) {
         guard let context = modelContext else { return }

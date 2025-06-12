@@ -51,59 +51,7 @@ struct MainMenuView: View {
                     .background(Color.appBackgroundColor)
                 } else {
                     List {
-                        NavigationLink(destination: PlantListView(plants: categoriesViewModel.allPlants, title: "All Plants")) {
-                            HStack {
-                                Image(systemName: "apple.meditate")
-                                Text("All Plants")
-                                    .foregroundColor(isEditMode ? .gray : .primary)
-                                    .bold()
-                                Spacer()
-                                Text("\(categoriesViewModel.allPlants.count)")
-                            }
-                            .padding(.vertical, 4)
-                            .bold()
-                        }
-                        .listRowBackground(Color(hex: "FAFFF9"))
-                        .disabled(isEditMode)
-                        
-                        Button(action: {
-                            if !isEditMode {
-                                showAddCategory.toggle()
-                            }
-                        }) {
-                            HStack {
-                                Image(systemName: "plus.circle")
-                                    .bold()
-                                Text("Add Categories")
-                                    .foregroundColor(isEditMode ? .gray : .primary)
-                                    .bold()
-                            }
-                        }
-                        .disabled(isEditMode)
-                        
-                        .alert("New Category", isPresented: $showAddCategory) {
-                            TextField("Add a new category", text: $newCategoryName)
-                                .foregroundColor(.primary)
-                            Button("Cancel", role: .cancel) {
-                                newCategoryName = ""
-                            }
-                            Button("Save") {
-                                if !newCategoryName.isEmpty && !categoriesViewModel.categoryExists(name: newCategoryName) {
-                                    categoriesViewModel.addCategory(name: newCategoryName, plants: [])
-                                    newCategoryName = ""
-                                }
-                            }
-                            .disabled(newCategoryName.isEmpty || newCategoryName.count > 24 || categoriesViewModel.categoryExists(name: newCategoryName))
-                        } message: {
-                            if newCategoryName.count > 24 {
-                                Text("Category name must be 24 characters or less")
-                            } else if categoriesViewModel.categoryExists(name: newCategoryName) {
-                                Text("A category with this name already exists")
-                            }
-                        }
-                        .listRowBackground(Color(hex: "FAFFF9"))
-                        
-                        Section(header: Text("My Categories")
+                        Section(header: Text("My Pot")
                             .font(.headline)
                             .foregroundColor(.primary)) {
                                 
@@ -113,7 +61,7 @@ struct MainMenuView: View {
                                 } else {
                                     ForEach(filtered) { category in
                                         HStack {
-                                            NavigationLink(destination: PlantListView(plants: category.plants, title: category.name)) {
+                                            NavigationLink(destination: PlantListView(pots: category.pots, title: category.name)) {
                                                 HStack {
                                                     Image(systemName: "leaf")
                                                         .bold()
@@ -126,36 +74,40 @@ struct MainMenuView: View {
                                             }
                                             .disabled(isEditMode)
                                             
-                                            if isEditMode {
-                                          
-                                                Button(action: {
-                                                    selectedCategory = category
-                                                    showEditSheet = true
-                                                }) {
-                                                    Image(systemName: "ellipsis.circle")
-                                                }
-                                                .buttonStyle(BorderlessButtonStyle())
-                                                
-                                                Divider()
-                                                    .frame(height: 20)
-                                                
-                                                Image(systemName: "line.3.horizontal")
-                                                    .foregroundColor(.gray)
-                                            } else {
-                                                Text("\(category.plants.count)")
-                                            }
+//                                            if isEditMode {
+//                                          
+//                                                Button(action: {
+//                                                    selectedCategory = category
+//                                                    showEditSheet = true
+//                                                }) {
+//                                                    Image(systemName: "ellipsis.circle")
+//                                                }
+//                                                .buttonStyle(BorderlessButtonStyle())
+//                                                
+//                                                Divider()
+//                                                    .frame(height: 20)
+//                                                
+//                                                Image(systemName: "line.3.horizontal")
+//                                                    .foregroundColor(.gray)
+//                                            } else {
+//                                                Text("\(category.pots.count)")
+//                                            }
                                         }
                                         .listRowBackground(Color(hex: "FAFFF9"))
                                     }
+                                    
                                 }
                             }
                     }
                     .background(Color.appBackgroundColor)
                     .scrollContentBackground(.hidden)
                 }
+                
             }
+            
 
             .navigationTitle("LeaFit")
+            
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -167,11 +119,13 @@ struct MainMenuView: View {
                 }
             }
             .foregroundColor(Color(hex: "428D6D"))
+            
             .searchable(text: $searchPlaceholder, placement: .navigationBarDrawer(displayMode: .automatic))
             .onAppear {
                 categoriesViewModel.setModelContext(modelContext)
             }
         }
+        
         .toolbar {
             ToolbarItemGroup(placement: .bottomBar) {
                 HStack {
@@ -226,17 +180,12 @@ struct MainMenuView: View {
             .disabled(renameCategoryName.isEmpty ||
                      renameCategoryName.count > 24 ||
                      (categoryToRename != nil && categoriesViewModel.categoryExists(name: renameCategoryName, excluding: categoryToRename!)))
-        } message: {
-            if renameCategoryName.count > 24 {
-                Text("Category name must be 24 characters or less")
-            } else if let category = categoryToRename, categoriesViewModel.categoryExists(name: renameCategoryName, excluding: category) {
-                Text("A category with this name already exists")
-            }
         }
     }
+    
 }
 
 #Preview {
     MainMenuView()
-        .modelContainer(for: PlantCategory.self, inMemory: true)
+//        .modelContainer(for: PlantCategory.self, inMemory: true)
 }

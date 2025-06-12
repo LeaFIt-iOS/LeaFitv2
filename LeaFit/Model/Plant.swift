@@ -66,13 +66,13 @@ class Leaf {
 class Diagnose {
     let id: UUID
     var confidenceScore: Int
-    @Relationship var disease: Disease
+    var diseaseId: String
     @Relationship (inverse: \Leaf.diagnose) var leaf: Leaf?
     
-    init(id: UUID = UUID(), confidenceScore: Int, disease: Disease, leaf: Leaf? = nil) {
+    init(id: UUID = UUID(), confidenceScore: Int, diseaseId: String, leaf: Leaf? = nil) {
         self.id = id
         self.confidenceScore = confidenceScore
-        self.disease = disease
+        self.diseaseId = diseaseId
         self.leaf = leaf
     }
     

@@ -187,5 +187,5 @@ struct MainMenuView: View {
 
 #Preview {
     MainMenuView()
-//        .modelContainer(for: PlantCategory.self, inMemory: true)
+        .modelContainer(for: PlantCategory.self)
 }

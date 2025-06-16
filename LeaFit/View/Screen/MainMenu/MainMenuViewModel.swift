@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-class CategoriesViewModel: ObservableObject {
-    @Published private var categories: [PlantCategory] = []
+class MainMenuViewModel: ObservableObject {
+    @Published private(set) var categories: [PlantCategory] = []
     private var modelContext: ModelContext?
     
 //    var allPlants: [String] {
@@ -23,15 +23,56 @@ class CategoriesViewModel: ObservableObject {
     
     func setModelContext(_ context: ModelContext) {
         self.modelContext = context
+
+        do {
+            // Check if any PlantCategory already exists in persistent store
+            let descriptor = FetchDescriptor<PlantCategory>()
+            let existing = try context.fetchCount(descriptor)
+
+            if existing == 0 {
+                let initialCategories = [
+                    PlantCategory(imageName: "img-aloevera", title: "Aloe Vera", nameScientific: ""),
+                    PlantCategory(imageName: "img-kaktus", title: "Cactus", nameScientific: ""),
+                    PlantCategory(imageName: "img-rose", title: "Rose", nameScientific: ""),
+                    PlantCategory(imageName: "img-monstera", title: "Monstera", nameScientific: ""),
+                    PlantCategory(imageName: "img-bonsai", title: "Bonsai", nameScientific: ""),
+                    PlantCategory(imageName: "img-jasmine", title: "Jasmine", nameScientific: ""),
+                    PlantCategory(imageName: "img-sanse", title: "Sansevieria", nameScientific: "")
+                ]
+
+                for category in initialCategories {
+                    context.insert(category)
+                    print("✅ Inserted: \(category.title)")
+                }
+
+                try context.save()
+                print("✅ Seeded initial categories.")
+                
+                let all = try context.fetch(FetchDescriptor<PlantCategory>())
+                print("📦 After seeding, fetch found \(all.count) categories")
+            } else {
+                print("ℹ️ Categories already exist in the store.")
+            }
+        } catch {
+            print("❌ Error checking/seeding data: \(error)")
+        }
+
         fetchCategories()
     }
     
     private func fetchCategories() {
         do {
-            let descriptor = FetchDescriptor<PlantCategory>(sortBy: [SortDescriptor(\.name)])
+            let descriptor = FetchDescriptor<PlantCategory>(sortBy: [SortDescriptor(\.title)])
             categories = try modelContext?.fetch(descriptor) ?? []
+
+            // Debug output
+            print("✅ Fetched \(categories.count) categories:")
+            categories.forEach { category in
+                print("→ \(category.title) [\(category.id)]")
+            }
+
         } catch {
-            print("Failed to fetch categories: \(error)")
+            print("❌ Failed to fetch categories: \(error)")
         }
     }
     
@@ -39,7 +80,7 @@ class CategoriesViewModel: ObservableObject {
         if searchText.isEmpty {
             return categories
         } else {
-            return categories.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+            return categories.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
         }
     }
     
@@ -76,7 +117,7 @@ class CategoriesViewModel: ObservableObject {
         guard newName.count <= 24 else { return }
         guard !categoryExists(name: newName, excluding: category) else { return }
         
-        category.name = newName
+        category.title = newName
         
         do {
             try context.save()
@@ -91,7 +132,7 @@ class CategoriesViewModel: ObservableObject {
             if let excluding = excluding, category.id == excluding.id {
                 return false
             }
-            return category.name.lowercased() == name.lowercased()
+            return category.title.lowercased() == name.lowercased()
         }
     }
    

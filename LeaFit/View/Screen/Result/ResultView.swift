@@ -9,10 +9,12 @@ import SwiftUI
 
 struct ResultView: View {
     var image: UIImage
+    var originalImage: UIImage
 
     @State var showDiagnose = true
     @State var showDiagnoseExplanation = false
     @State var showTreatmentExplanation = false
+    @StateObject var viewModel: ContentViewModel
     
     private let treatments: [String] = [
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
@@ -32,12 +34,69 @@ struct ResultView: View {
                                 .fill(Color.gray)
                                 .opacity(0.2)
                                 .frame(width: 175, height: 175)
-                                .overlay(Image(uiImage: image).resizable().scaledToFit().frame(width: 175, height: 175))
+                                .overlay(Image(uiImage: originalImage).resizable().scaledToFit().frame(width: 175, height: 175))
+                            
+                            
                             
                             RoundedRectangle(cornerRadius: 15)
                                 .fill(Color.gray)
                                 .opacity(0.2)
                                 .frame(width: 175, height: 175)
+                                .onTapGesture {
+                                    Task {
+                                        await viewModel.runInference()
+                                    }
+                                }
+                                .overlay(
+                                    Group{
+//                                        if viewModel.processing {
+//                                            ProgressView()
+//                                        } else {
+                                        if let uiImage = viewModel.combinedMaskImage {
+                                            Image(uiImage: viewModel.uiImage!)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .aspectRatio(contentMode: .fit)
+//                                        }
+                                        } else {
+                                            ProgressView()
+                                        }
+                                    }
+                                        .overlay(
+                                        buildMaskImage(mask: viewModel.combinedMaskImage)
+                                            .opacity(0.7))
+                                    .overlay(
+                                        DetectionViewRepresentable(
+                                            predictions: $viewModel.predictions)
+                                        .opacity(0))
+//                                    .frame(maxHeight: 400)
+                                    
+//                                    Image(uiImage: image.getMaskImage()).resizable().scaledToFit().frame(width: 175, height: 175)
+//                                    ForEach(Array(viewModel.maskPredictions.enumerated()), id: \.offset) { index, maskPrediction in
+//                                        VStack(alignment: .center) {
+//                                            Group {
+//                                                if let maskImg = maskPrediction.getMaskImage() {
+//                                                    Image(uiImage: maskImg)
+//                                                        .resizable()
+//                                                        .antialiased(false)
+//                                                        .interpolation(.none)
+//                                                        .aspectRatio(contentMode: .fit)
+//                                                        .background(Color.black)
+//                                                        .contextMenu {
+//                                                            Button(action: {
+//                                                                UIImageWriteToSavedPhotosAlbum(maskImg, nil, nil, nil)
+//                                                            }) {
+//                                                                Label("Save to camera roll", systemImage: "square.and.arrow.down")
+//                                                            }
+//                                                        }
+//                                                } else {
+//                                                    let _ = print("maskImg is nil")
+//                                                }
+//                                            }
+//                                            Divider()
+//                                        }.frame(maxWidth: .infinity, alignment: .center)
+//                                    }
+                                )
                         }
                     )
                 
@@ -57,7 +116,7 @@ struct ResultView: View {
                                         .frame(width: 30, height: 30)
                                         .foregroundColor(LeaFitColors.green)
                                     
-                                    Text("[Decease Name]")
+                                    Text("[Disease Name]")
                                         .font(.system(size: 17, weight: .semibold, design: .default))
                                         .foregroundColor(LeaFitColors.primary)
                                 }
@@ -143,6 +202,57 @@ struct ResultView: View {
         .accentColor(LeaFitColors.primary)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(LeaFitColors.background)
+        .onAppear {
+            
+            viewModel.addImage(image)
+        }
+//        .onChange(of: viewModel.uiImage) { oldValue, newValue in
+//            Task {
+//                await viewModel.runInference()
+//            }
+//        }
     }
     
+    
+    @ViewBuilder private func buildMaskImage(mask: UIImage?) -> some View {
+        if let mask {
+            Image(uiImage: mask)
+                .resizable()
+                .antialiased(false)
+                .interpolation(.none)
+        }
+    }
+    
+    @ViewBuilder private func buildMasksSheet() -> some View {
+        ScrollView {
+            LazyVStack(alignment: .center, spacing: 8) {
+                ForEach(Array(viewModel.maskPredictions.enumerated()), id: \.offset) { index, maskPrediction in
+                    VStack(alignment: .center) {
+                        Group {
+                            if let maskImg = maskPrediction.getMaskImage() {
+                                Image(uiImage: maskImg)
+                                    .resizable()
+                                    .antialiased(false)
+                                    .interpolation(.none)
+                                    .aspectRatio(contentMode: .fit)
+                                    .background(Color.black)
+                                    .contextMenu {
+                                        Button(action: {
+                                            UIImageWriteToSavedPhotosAlbum(maskImg, nil, nil, nil)
+                                        }) {
+                                            Label("Save to camera roll", systemImage: "square.and.arrow.down")
+                                        }
+                                    }
+                            } else {
+                                let _ = print("maskImg is nil")
+                            }
+                        }
+                        Divider()
+                    }.frame(maxWidth: .infinity, alignment: .center)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding()
+        }
+    }
 }

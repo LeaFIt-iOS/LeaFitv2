@@ -10,22 +10,9 @@
 		F58A20532DF6A35E00B59ED4 /* LeaFit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LeaFit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		15EF59712DFFCD9F00629BC8 /* Exceptions for "LeaFit" folder in "LeaFit" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = F58A20522DF6A35E00B59ED4 /* LeaFit */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F58A20552DF6A35E00B59ED4 /* LeaFit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				15EF59712DFFCD9F00629BC8 /* Exceptions for "LeaFit" folder in "LeaFit" target */,
-			);
 			path = LeaFit;
 			sourceTree = "<group>";
 		};
@@ -265,10 +252,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"LeaFit/Preview Content\"";
-				DEVELOPMENT_TEAM = FG24D3VYJ3;
+				DEVELOPMENT_TEAM = T9H83KAQ83;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = LeaFit/Info.plist;
+				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera permission.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -297,10 +284,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"LeaFit/Preview Content\"";
-				DEVELOPMENT_TEAM = FG24D3VYJ3;
+				DEVELOPMENT_TEAM = T9H83KAQ83;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = LeaFit/Info.plist;
+				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera permission.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

@@ -158,6 +158,9 @@ struct PlantListView: View {
         }
         .scrollContentBackground(.hidden)
         .background(Color.appBackgroundColor.ignoresSafeArea())
+//        .onAppear() {
+//            fetchAllPots()
+//        }
         .alert("New Pots", isPresented: $showAddPopup) {
             TextField("Type your new pot name", text: $newPotname)
                 .foregroundColor(.primary)
@@ -176,6 +179,20 @@ struct PlantListView: View {
 
     }
     
+    private func fetchAllPots() {
+        let fetchDescriptor = FetchDescriptor<Pot>()
+        
+        do {
+            let pots = try modelContext.fetch(fetchDescriptor)
+            print("=== All Pots ===")
+            for pot in pots {
+                print("• \(pot.namePot)")
+            }
+        } catch {
+            print("Error fetching pots: \(error)")
+        }
+    }
+    
     private func savePot() {
         
         guard !newPotname.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -192,6 +209,8 @@ struct PlantListView: View {
         
         do {
             try modelContext.save()
+            print( "Saved new pot: \(newPot.namePot)")
+            fetchAllPots()
         } catch {
             print("Error saving pot: \(error)")
         }

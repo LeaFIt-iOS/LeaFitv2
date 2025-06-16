@@ -1,191 +1,168 @@
 import SwiftUI
 import SwiftData
 
+struct PotList: Identifiable {
+    let id = UUID()
+    let imageName: String
+    let titles: String
+    let destinationTitle: String
+}
+
 struct MainMenuView: View {
     @StateObject private var categoriesViewModel: CategoriesViewModel
     
     @State private var searchPlaceholder = ""
-    @State private var showAddCategory = false
-    @State private var newCategoryName: String = ""
-    @State private var showRenameCategory = false
-    @State private var renameCategoryName: String = ""
-    @State private var categoryToRename: PlantCategory?
-    @State private var showEditSheet = false
     @State private var selectedCategory: PlantCategory?
     @State private var isEditMode = false
     
     @Environment(\.modelContext) private var modelContext
     
-    init() {
+    init(){
         let viewModel = CategoriesViewModel()
         _categoriesViewModel = StateObject(wrappedValue: viewModel)
-        
-        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor(hex: "428D6D")]
-        let toolbarAppearance = UIToolbarAppearance()
-        toolbarAppearance.configureWithOpaqueBackground()
-        toolbarAppearance.backgroundColor = UIColor(hex: "BEDCBA")
-        UIToolbar.appearance().standardAppearance = toolbarAppearance
-        UIToolbar.appearance().scrollEdgeAppearance = toolbarAppearance
+    }
+    
+    let previewPlants: [PotList] = [
+        PotList(imageName: "img-aloevera", titles: "Aloe Vera", destinationTitle: "Aloe Vera"),
+        PotList(imageName: "img-kaktus", titles: "Cactus", destinationTitle: "Cactus"),
+        PotList(imageName: "img-rose", titles: "Rose", destinationTitle: "Rose"),
+        PotList(imageName: "img-monstera", titles: "Monstera", destinationTitle: "Monstera"),
+        PotList(imageName: "img-bonsai", titles: "Bonsai", destinationTitle: "Bonsai"),
+        PotList(imageName: "img-jasmine", titles: "Jasmine", destinationTitle: "Jasmine"),
+        PotList(imageName: "img-sanse", titles: "Sansevieria", destinationTitle: "Sansevieria")
+    ]
+    
+    var groupedPlants: [[PotList]] {
+        stride(from: 0, to: previewPlants.count, by: 3).map {
+            Array(previewPlants[$0..<min($0 + 3, previewPlants.count)])
+        }
     }
     
     var body: some View {
-        NavigationStack {
-            let filtered = categoriesViewModel.filteredCategories(searchText: searchPlaceholder)
-            let isSearchingWithNoResults = !searchPlaceholder.isEmpty && filtered.isEmpty && !categoriesViewModel.allCategories.isEmpty
-            
-            VStack(spacing: 0) {
-                if isSearchingWithNoResults {
-                    VStack {
-                        Spacer()
-                        Image("SearchErrorLogo")
-                        Text("No Results Found")
-                            .font(.title2)
-                            .bold()
-                            .foregroundColor(.gray)
-                        Text("Check spelling or try a new search")
-                            .font(.title3)
-                            .foregroundColor(.gray)
-                        Spacer()
+        NavigationStack  {
+            ZStack {
+                ZStack {
+                    Image("img-framejendela")
+                        .padding(.top, 70)
+                    VStack(spacing: -80) {
+                        ForEach(Array(groupedPlants.enumerated()), id: \.offset) { _, group in
+                            ZStack {
+                                Image("img-rakpot")
+                                    .padding(.top, 180)
+                                HStack(spacing: 2) {
+                                    ForEach(group) { plant in
+                                        if plant.titles == "Aloe Vera" {
+                                            NavigationLink(destination: PlantListView(pots: [], title: plant.destinationTitle)) {
+                                                VStack(spacing: 0) {
+                                                    Image(plant.imageName)
+                                                        .resizable()
+                                                        .frame(width: 113, height: 144)
+                                                    Text(plant.titles)
+                                                        .font(.system(size: 14, weight: .semibold, design: .default))
+                                                        .foregroundColor(Color.white)
+                                                }
+                                            }
+                                                .padding(.top, 40)
+
+                                        } else {
+                                                    NavigationLink(destination: UnavailablePotView(pots: [], title: plant.destinationTitle)) {
+                                                        VStack(spacing: 0) {
+                                                            Image(plant.imageName)
+                                                                .resizable()
+                                                                .frame(width: 113, height: 144)
+                                                            Text(plant.titles)
+                                                                .font(.system(size: 14, weight: .semibold, design: .default))
+                                                                .foregroundColor(Color.white)
+                                                        }
+                                                    }
+                                                    .padding(.top, 40)
+
+                                                }
+                                        
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                        }
+                        .navigationTitle("LeaFit")
+                        .navigationBarTitleDisplayMode(.large)
+                        .foregroundColor(Color(hex: "428D6D"))
+                        .toolbar {
+                            ToolbarItemGroup(placement: .bottomBar) {
+                                HStack {
+                                    Button(action: {}) {
+                                        Image(systemName: "info.circle")
+                                            .foregroundStyle(Color(hex: "428D6D"))
+                                    }
+                                    Spacer()
+                                    Text ("\(previewPlants.count) Plants")
+                                        .font(.caption)
+                                        .foregroundStyle(Color(hex: "428D6D"))
+                                    Spacer()
+                                    Button(action: {}) {
+                                        Image(systemName: "camera")
+                                            .foregroundStyle(Color(hex: "428D6D"))
+                                    }
+                                }
+                            }
+                        }
+                        
+                        //        .actionSheet(isPresented: $showEditSheet) {
+                        //            ActionSheet(
+                        //                title: Text("\(selectedCategory?.name ?? "Select a category to edit")"),
+                        //                buttons: [
+                        //                    .default(Text("Rename")) {
+                        //                        if let category = selectedCategory {
+                        //                            categoryToRename = category
+                        //                            renameCategoryName = category.name
+                        //                            showRenameCategory = true
+                        //                        }
+                        //                    },
+                        //                    .destructive(Text("Delete")) {
+                        //                        if let category = selectedCategory {
+                        //                            categoriesViewModel.deleteCategory(category)
+                        //                        }
+                        //                    },
+                        //                    .cancel()
+                        //                ]
+                        //            )
+                        //        }
+                        //        .alert("Rename Category", isPresented: $showRenameCategory) {
+                        //            TextField("Category name", text: $renameCategoryName)
+                        //                .foregroundColor(.primary)
+                        //            Button("Cancel", role: .cancel) {
+                        //                renameCategoryName = ""
+                        //                categoryToRename = nil
+                        //            }
+                        //            Button("Save") {
+                        //                if let category = categoryToRename,
+                        //                   !renameCategoryName.isEmpty,
+                        //                   !categoriesViewModel.categoryExists(name: renameCategoryName, excluding: category) {
+                        //                    categoriesViewModel.renameCategory(category, newName: renameCategoryName)
+                        //                    renameCategoryName = ""
+                        //                    categoryToRename = nil
+                        //                }
+                        //            }
+                        //            .disabled(renameCategoryName.isEmpty ||
+                        //                     renameCategoryName.count > 24 ||
+                        //                     (categoryToRename != nil && categoriesViewModel.categoryExists(name: renameCategoryName, excluding: categoryToRename!)))
+                        //        }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.appBackgroundColor)
-                } else {
-                    List {
-                        Section(header: Text("My Pot")
-                            .font(.headline)
-                            .foregroundColor(.primary)) {
-                                
-                                if filtered.isEmpty && !searchPlaceholder.isEmpty {
-                                    Text("No results found")
-                                        .foregroundColor(.gray)
-                                } else {
-                                    ForEach(filtered) { category in
-                                        HStack {
-                                            NavigationLink(destination: PlantListView(pots: category.pots, title: category.name)) {
-                                                HStack {
-                                                    Image(systemName: "leaf")
-                                                        .bold()
-                                                    Text(category.name)
-                                                        .foregroundColor(.primary)
-                                                        .bold()
-                                                    Spacer()
-                                                }
-                                                .padding(.vertical, 4)
-                                            }
-                                            .disabled(isEditMode)
-                                            
-//                                            if isEditMode {
-//                                          
-//                                                Button(action: {
-//                                                    selectedCategory = category
-//                                                    showEditSheet = true
-//                                                }) {
-//                                                    Image(systemName: "ellipsis.circle")
-//                                                }
-//                                                .buttonStyle(BorderlessButtonStyle())
-//                                                
-//                                                Divider()
-//                                                    .frame(height: 20)
-//                                                
-//                                                Image(systemName: "line.3.horizontal")
-//                                                    .foregroundColor(.gray)
-//                                            } else {
-//                                                Text("\(category.pots.count)")
-//                                            }
-                                        }
-                                        .listRowBackground(Color(hex: "FAFFF9"))
-                                    }
-                                    
-                                }
-                            }
-                    }
-                    .background(Color.appBackgroundColor)
+                    .ignoresSafeArea(.all)
                     .scrollContentBackground(.hidden)
                 }
                 
-            }
-            
-
-            .navigationTitle("LeaFit")
-            
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(isEditMode ? "Done" : "Edit") {
-                        withAnimation {
-                            isEditMode.toggle()
-                        }
-                    }
-                }
-            }
-            .foregroundColor(Color(hex: "428D6D"))
-            
-            .searchable(text: $searchPlaceholder, placement: .navigationBarDrawer(displayMode: .automatic))
-            .onAppear {
-                categoriesViewModel.setModelContext(modelContext)
+                
+                
             }
         }
         
-        .toolbar {
-            ToolbarItemGroup(placement: .bottomBar) {
-                HStack {
-                    Button(action: {}) {
-                        Image(systemName: "info.circle")
-                            .foregroundStyle(Color(hex: "428D6D"))
-                    }
-                    Spacer()
-                    Button(action: {}) {
-                        Image(systemName: "camera")
-                            .foregroundStyle(Color(hex: "428D6D"))
-                    }
-                }
-            }
+        
+        #Preview {
+            MainMenuView()
+                .modelContainer(for: PlantCategory.self, inMemory: true)
         }
-        .actionSheet(isPresented: $showEditSheet) {
-            ActionSheet(
-                title: Text("\(selectedCategory?.name ?? "Select a category to edit")"),
-                buttons: [
-                    .default(Text("Rename")) {
-                        if let category = selectedCategory {
-                            categoryToRename = category
-                            renameCategoryName = category.name
-                            showRenameCategory = true
-                        }
-                    },
-                    .destructive(Text("Delete")) {
-                        if let category = selectedCategory {
-                            categoriesViewModel.deleteCategory(category)
-                        }
-                    },
-                    .cancel()
-                ]
-            )
-        }
-        .alert("Rename Category", isPresented: $showRenameCategory) {
-            TextField("Category name", text: $renameCategoryName)
-                .foregroundColor(.primary)
-            Button("Cancel", role: .cancel) {
-                renameCategoryName = ""
-                categoryToRename = nil
-            }
-            Button("Save") {
-                if let category = categoryToRename,
-                   !renameCategoryName.isEmpty,
-                   !categoriesViewModel.categoryExists(name: renameCategoryName, excluding: category) {
-                    categoriesViewModel.renameCategory(category, newName: renameCategoryName)
-                    renameCategoryName = ""
-                    categoryToRename = nil
-                }
-            }
-            .disabled(renameCategoryName.isEmpty ||
-                     renameCategoryName.count > 24 ||
-                     (categoryToRename != nil && categoriesViewModel.categoryExists(name: renameCategoryName, excluding: categoryToRename!)))
-        }
-    }
-    
-}
-
-#Preview {
-    MainMenuView()
-        .modelContainer(for: PlantCategory.self)
-}

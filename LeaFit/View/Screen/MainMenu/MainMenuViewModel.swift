@@ -16,19 +16,6 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-//@Model
-//class PlantCategorys: Identifiable {
-//    let id: UUID
-//    var name: String
-//    var plants: [String]
-//    
-//    init(id: UUID = UUID(), name: String, plants: [String]) {
-//        self.id = id
-//        self.name = name
-//        self.plants = plants
-//    }
-//}
-
 class CategoriesViewModel: ObservableObject {
     @Published private var categories: [PlantCategory] = []
     private var modelContext: ModelContext?
@@ -44,21 +31,6 @@ class CategoriesViewModel: ObservableObject {
     func setModelContext(_ context: ModelContext) {
         self.modelContext = context
         fetchCategories()
-        
-        //dummy data
-        if categories.isEmpty {
-            let initialCategories = [
-                PlantCategory(name: "Aloe Vera", nameScientific: "Aloe Vera", pots: []),
-                PlantCategory(name: "Anggrek", nameScientific: "Aloe Vera2", pots: []),
-                PlantCategory(name: "Cactus", nameScientific: "Aloe Vera3", pots: [])
-
-            ]
-            initialCategories.forEach { category in
-                modelContext?.insert(category)
-            }
-            try? modelContext?.save()
-            fetchCategories()
-        }
     }
     
     private func fetchCategories() {
@@ -129,4 +101,17 @@ class CategoriesViewModel: ObservableObject {
             return category.name.lowercased() == name.lowercased()
         }
     }
+   
+    func categoryImageName(for categoryName: String) -> String {
+            switch categoryName.lowercased() {
+            case "aloe vera":
+                return "emotaloe"
+            case "cactus":
+                return "img-kaktus"
+            case "rose":
+                return "img-rose"
+            default:
+                return "emotaloe" // Fallback image
+            }
+        }
 }

@@ -1,52 +1,26 @@
 //
-//  SamplePreview.swift
-//  LeaFit
+//import SwiftUI
+//import Foundation
 //
-//  Created by Yonathan Hilkia on 11/06/25.
+//struct SwiftUIView : View {
 //
-
-import SwiftUI
-import Foundation
-
-struct SamplePreview : View {
-    var body: some View {
-        Text("Hello, World!")
-        TabView {
-            NavigationStack {
-                List {
-                    Text("Home Content")
-                        .frame(height: 20000)
-                }
-                .navigationTitle("Home Title")
-            }
-            .tabItem {
-                Label("Home", systemImage: "house")
-                
-            }
-            .toolbarBackground(
-
-                // 1
-                Color.yellow,
-                // 2
-                for: .tabBar)
-            
-            Text("Search")
-                .tabItem {
-                    Label("Search", systemImage: "magnifyingglass")
-                }
-            Text("Notification")
-                .tabItem {
-                    Label("Notification", systemImage: "bell")
-                }
-            Text("Settings")
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape")
-                }
-        }
-        
-    }
-}
-
-#Preview {
-    SamplePreview()
-}
+//    @State var showingPopup = false // 1
+//
+//    var body: some View {
+//        ZStack {
+//            Color.red.opacity(0.2)
+//            Button("Push me") {
+//                showingPopup = true // 2
+//            }
+//        }
+//        .popup(isPresented: $showingPopup) { // 3
+//            ZStack { // 4
+//                Color.blue.frame(width: 200, height: 100)
+//                Text("Popup!")
+//            }
+//        }
+//    }
+//}
+//#Preview {
+//    SwiftUIView()
+//}

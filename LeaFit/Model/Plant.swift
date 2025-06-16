@@ -12,15 +12,16 @@ import SwiftData
 
 @Model
 class PlantCategory {
-    let id: UUID
-    var name: String
-    var nameScientific: String
+    @Attribute var id: UUID
+    @Attribute var imageName: String
+    @Attribute var title: String
+    @Attribute var nameScientific: String
     @Relationship var pots: [Pot]
 
-    
-    init(id: UUID = UUID(), name: String, nameScientific: String, pots: [Pot] = []) {
+    init(id: UUID = UUID(), imageName: String, title: String, nameScientific: String, pots: [Pot] = []) {
         self.id = id
-        self.name = name
+        self.imageName = imageName
+        self.title = title
         self.nameScientific = nameScientific
         self.pots = pots
     }
@@ -28,10 +29,10 @@ class PlantCategory {
 
 @Model
 class Pot {
-    let id: UUID
-    var namePot: String
+    @Attribute var id: UUID
+    @Attribute var namePot: String
     @Relationship var leaves: [Leaf]
-    @Relationship (inverse: \PlantCategory.pots) var plantCategory: PlantCategory?
+    @Relationship(inverse: \PlantCategory.pots) var plantCategory: PlantCategory?
     
     init(id: UUID = UUID(), namePot: String, leaves: [Leaf], plantCategory: PlantCategory? = nil) {
         self.id = id
@@ -43,13 +44,13 @@ class Pot {
 
 @Model
 class Leaf {
-    let id: UUID
-    var originalImage: Data
-    var processedImage: Data
-    var leafNote: String? = ""
-    var dateCreated: Date
+    @Attribute var id: UUID
+    @Attribute var originalImage: Data
+    @Attribute var processedImage: Data
+    @Attribute var leafNote: String? = ""
+    @Attribute var dateCreated: Date
     @Relationship var diagnose: Diagnose
-    @Relationship (inverse: \Pot.leaves) var pot: Pot?
+    @Relationship(inverse: \Pot.leaves) var pot: Pot?
     
     init(id: UUID = UUID(), originalImage: Data, processedImage: Data, leafNote: String, dateCreated: Date, diagnose: Diagnose, pot: Pot? = nil) {
         self.id = id
@@ -64,10 +65,10 @@ class Leaf {
 
 @Model
 class Diagnose {
-    let id: UUID
-    var confidenceScore: Int
-    var diseaseId: String
-    @Relationship (inverse: \Leaf.diagnose) var leaf: Leaf?
+    @Attribute var id: UUID
+    @Attribute var confidenceScore: Int
+    @Attribute var diseaseId: String
+    @Relationship(inverse: \Leaf.diagnose) var leaf: Leaf?
     
     init(id: UUID = UUID(), confidenceScore: Int, diseaseId: String, leaf: Leaf? = nil) {
         self.id = id

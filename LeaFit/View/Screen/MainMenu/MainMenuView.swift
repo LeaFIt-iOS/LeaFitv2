@@ -92,16 +92,14 @@ struct MainMenuView: View {
                         .toolbar {
                             ToolbarItemGroup(placement: .bottomBar) {
                                 HStack {
-                                    Button(action: {}) {
+                                    NavigationLink(destination: InformationView()) {
                                         Image(systemName: "info.circle")
                                             .foregroundStyle(Color(hex: "428D6D"))
                                     }
+                                    
                                     Spacer()
-                                    Text ("\(previewPlants.count) Plants")
-                                        .font(.caption)
-                                        .foregroundStyle(Color(hex: "428D6D"))
-                                    Spacer()
-                                    Button(action: {}) {
+                                    
+                                    NavigationLink(destination: CameraRulesView()) {
                                         Image(systemName: "camera")
                                             .foregroundStyle(Color(hex: "428D6D"))
                                     }

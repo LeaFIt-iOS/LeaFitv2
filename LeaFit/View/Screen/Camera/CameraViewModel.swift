@@ -71,10 +71,10 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         }
 
         session.commitConfiguration()
-        DispatchQueue.main.async {
+        Task {
             self.session.startRunning()
         }
-
+        
         isConfigured = true
     }
     

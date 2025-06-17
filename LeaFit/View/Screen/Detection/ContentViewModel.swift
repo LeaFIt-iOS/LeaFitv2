@@ -20,6 +20,13 @@ enum Status {
     case generateMasksFromProtos
 }
 
+let className = [
+    "anthracnose",
+    "rot",
+    "rust",
+    "sunburn"
+]
+
 extension Status {
     var message: String {
         switch self {
@@ -97,6 +104,10 @@ class ContentViewModel: ObservableObject {
         }
         await runVisionInference()
     }
+    
+//    @MainActor func getDiseasesNames() -> [String: Int] {
+////        return self.predictions.map { $0.diseaseId }
+//    }
 }
 
 // MARK: Vision Inference
@@ -118,11 +129,15 @@ extension ContentViewModel {
                 }
             }
             
+//            print("results \(results)")
+            
             guard let boxesOutput = results[1, default: nil] as? VNCoreMLFeatureValueObservation,
                   let masksOutput = results[0, default: nil] as? VNCoreMLFeatureValueObservation
             else {
                 return
             }
+            
+//            print("feat name \(boxesOutput.featureName.)")
             
             guard let boxes = boxesOutput.featureValue.multiArrayValue else {
                 return
@@ -131,9 +146,20 @@ extension ContentViewModel {
             let numSegmentationMasks = 32
             let numClasses = Int(truncating: boxes.shape[1]) - 4 - numSegmentationMasks
             
+//            print("boxes \(boxes.shape[1])")
+//            
+//            for box in boxes.shape {
+//                print("box \(box)")
+//            }
+//
+            for res in results {
+                print("rconf \(res.confidence)")
+                print("\(res)")
+            }
+            
 //            let label = results.let
 //            for result in results {
-//
+////                let label = result.labels
 //            }
             
             NSLog("Model has \(numClasses) classes")
@@ -159,6 +185,8 @@ extension ContentViewModel {
             let groupedPredictions = Dictionary(grouping: predictions) { prediction in
                 prediction.classIndex
             }
+            
+            print("grouped prediction \(groupedPredictions)")
             
             var nmsPredictions: [Prediction] = []
             let _ = groupedPredictions.mapValues { predictions in
@@ -258,8 +286,19 @@ extension ContentViewModel {
                 })
             segmentationRequest.preferBackgroundProcessing = false
             segmentationRequest.imageCropAndScaleOption = .scaleFill
+//            for result in segmentationRequest.results! {
+//                guard let label = result.labels.first?.identifier as? String,
+//                        let colorIndex = classes.firstIndex(of: label) else {
+//                        return nil
+//                }
+//            }
             
             requests = [segmentationRequest]
+            
+//            for req in requests {
+//                let a  = req.results?.first.
+//            }
+            
         } catch let error as NSError {
             print("Model loading went wrong: \(error)")
         }
@@ -343,8 +382,6 @@ extension ContentViewModel {
                     xyxy: .init(x1: left, y1: top, x2: right, y2: bottom),
                     maskCoefficients: maskCoefficients,
                     inputImgSize: inputImgSize
-//                    ,
-//                    label:
                 )
 
                 resultsQueue.async(flags: .barrier) {

@@ -78,6 +78,9 @@ struct DetectionViewRepresentable: UIViewRepresentable {
             CATransaction.begin()
             CATransaction.setValue(kCFBooleanTrue, forKey: kCATransactionDisableActions)
             
+            print("prediction \(prediction)")
+            print("prediction x1 \(prediction.xyxy.x1)")
+            
             (uiView as? DetectionView)?.detectionLayer.addDetection(
                 objectBounds: rect,
                 confidence: prediction.score)

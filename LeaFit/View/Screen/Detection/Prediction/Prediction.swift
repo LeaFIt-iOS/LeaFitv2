@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: Prediction
-struct Prediction {
+struct Prediction: Identifiable {
     let id = UUID()
     
     let classIndex: Int
@@ -17,8 +17,7 @@ struct Prediction {
     let maskCoefficients: [Float]
     
     let inputImgSize: CGSize
-    
-//    let label: String
+    var diseaseId: String { className[classIndex] }
   
     static var zero: Prediction {
         return Prediction(
@@ -27,8 +26,7 @@ struct Prediction {
             xyxy: .init(x1: 0, y1: 0, x2: 0, y2: 0),
             maskCoefficients: [],
             inputImgSize: .zero
-//            ,
-//            label: ""
+//            label
         )
     }
 }

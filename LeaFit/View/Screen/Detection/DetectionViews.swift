@@ -43,6 +43,14 @@ struct DetectionViews: View {
             
             settingsForm
               .safeAreaPadding(.top, 32)
+            
+            VStack {
+                ForEach(viewModel.predictions) { i in
+    //                            NSLog("\(className[i.classIndex])")
+                    Text(i.diseaseId)
+                    
+                }
+            }
         }
         .background(Color(UIColor.systemGroupedBackground))
         .sheet(isPresented: $presentMaskPreview) {
@@ -53,10 +61,13 @@ struct DetectionViews: View {
     var imageView: some View {
         Group {
             if let uiImage = viewModel.uiImage {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFit()
-                    .aspectRatio(contentMode: .fit)
+//                ZStack{
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .aspectRatio(contentMode: .fit)
+                    
+//                }
             } else {
                 Color
                     .gray
@@ -74,6 +85,7 @@ struct DetectionViews: View {
     }
     
     var settingsForm: some View {
+        
         Form {
             Section {
                 PhotosPicker(

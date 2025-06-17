@@ -48,54 +48,24 @@ struct ResultView: View {
                                     }
                                 }
                                 .overlay(
-                                    Group{
-//                                        if viewModel.processing {
-//                                            ProgressView()
-//                                        } else {
-                                        if let uiImage = viewModel.combinedMaskImage {
-                                            Image(uiImage: viewModel.uiImage!)
-                                                .resizable()
-                                                .scaledToFit()
-                                                .aspectRatio(contentMode: .fit)
-//                                        }
-                                        } else {
-                                            ProgressView()
+                                        Group{
+                                            if let uiImage = viewModel.combinedMaskImage {
+                                                Image(uiImage: viewModel.uiImage!)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .aspectRatio(contentMode: .fit)
+                                                //                                        }
+                                            } else {
+                                                ProgressView()
+                                            }
                                         }
-                                    }
                                         .overlay(
-                                        buildMaskImage(mask: viewModel.combinedMaskImage)
-                                            .opacity(0.7))
-                                    .overlay(
-                                        DetectionViewRepresentable(
-                                            predictions: $viewModel.predictions)
-                                        .opacity(0))
-//                                    .frame(maxHeight: 400)
-                                    
-//                                    Image(uiImage: image.getMaskImage()).resizable().scaledToFit().frame(width: 175, height: 175)
-//                                    ForEach(Array(viewModel.maskPredictions.enumerated()), id: \.offset) { index, maskPrediction in
-//                                        VStack(alignment: .center) {
-//                                            Group {
-//                                                if let maskImg = maskPrediction.getMaskImage() {
-//                                                    Image(uiImage: maskImg)
-//                                                        .resizable()
-//                                                        .antialiased(false)
-//                                                        .interpolation(.none)
-//                                                        .aspectRatio(contentMode: .fit)
-//                                                        .background(Color.black)
-//                                                        .contextMenu {
-//                                                            Button(action: {
-//                                                                UIImageWriteToSavedPhotosAlbum(maskImg, nil, nil, nil)
-//                                                            }) {
-//                                                                Label("Save to camera roll", systemImage: "square.and.arrow.down")
-//                                                            }
-//                                                        }
-//                                                } else {
-//                                                    let _ = print("maskImg is nil")
-//                                                }
-//                                            }
-//                                            Divider()
-//                                        }.frame(maxWidth: .infinity, alignment: .center)
-//                                    }
+                                            buildMaskImage(mask: viewModel.combinedMaskImage)
+                                                .opacity(0.7))
+                                        .overlay(
+                                            DetectionViewRepresentable(
+                                                predictions: $viewModel.predictions)
+                                            .opacity(0))
                                 )
                         }
                     )

@@ -23,6 +23,8 @@ class DetectionLayer: CALayer {
             identifier: className ?? "",
             confidence: confidence)
         
+        print("class name \(className)")
+        
         shapeLayer.addSublayer(annotationLayer)
         
         addSublayer(shapeLayer)

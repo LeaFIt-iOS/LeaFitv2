@@ -17,6 +17,8 @@ struct Prediction {
     let maskCoefficients: [Float]
     
     let inputImgSize: CGSize
+    
+//    let label: String
   
     static var zero: Prediction {
         return Prediction(
@@ -24,7 +26,10 @@ struct Prediction {
             score: 0,
             xyxy: .init(x1: 0, y1: 0, x2: 0, y2: 0),
             maskCoefficients: [],
-            inputImgSize: .zero)
+            inputImgSize: .zero
+//            ,
+//            label: ""
+        )
     }
 }
 

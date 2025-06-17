@@ -71,26 +71,6 @@ class ContentViewModel: ObservableObject {
         Task {
             await runInference()
         }
-        $maskPredictions.sink { [weak self] predictions in
-            guard !predictions.isEmpty else { return }
-            
-            self?.combinedMaskImage = predictions.combineToSingleImage()
-            
-            print("i was here")
-        }.store(in: &cancellables)
-    }
-    
-//    func addImage(_ image: UIImage) {
-//        Task {
-//            await MainActor.run {
-//                self.uiImage = image
-//                self.predictions = []
-//                self.maskPredictions = []
-//                self.combinedMaskImage = nil
-//            }
-//
-//            await runInference()
-//        }
 //        $maskPredictions.sink { [weak self] predictions in
 //            guard !predictions.isEmpty else { return }
 //            
@@ -98,30 +78,9 @@ class ContentViewModel: ObservableObject {
 //            
 //            print("i was here")
 //        }.store(in: &cancellables)
-//    }
-
+    }
         
     private func setupBindings() {
-//        $imageSelection.sink { [weak self] item in
-//            guard let item else { return }
-//            
-//            Task { [weak self] in
-//                
-//                if let data = try? await item.loadTransferable(type: Data.self) {
-//                    if let uiImage = UIImage(data: data) {
-//                        await MainActor.run { [weak self] in
-//                            self?.predictions = []
-//                            self?.maskPredictions = []
-//                            self?.combinedMaskImage = nil
-//                            self?.uiImage = uiImage
-//                        }
-//                        return
-//                    }
-//                }
-//            }
-//            
-//        }.store(in: &cancellables)
-        
         $maskPredictions.sink { [weak self] predictions in
             guard !predictions.isEmpty else { return }
             
@@ -171,6 +130,11 @@ extension ContentViewModel {
             
             let numSegmentationMasks = 32
             let numClasses = Int(truncating: boxes.shape[1]) - 4 - numSegmentationMasks
+            
+//            let label = results.let
+//            for result in results {
+//
+//            }
             
             NSLog("Model has \(numClasses) classes")
             
@@ -270,10 +234,13 @@ extension ContentViewModel {
             }
             
             let inputDesc = model.model.modelDescription.inputDescriptionsByName
+            let classes = model.model.modelDescription.classLabels as? [String]
+            print("classes \(classes)")
+            
             guard let imgInputDesc = inputDesc["image"],
                   let imgsz = imgInputDesc.imageConstraint
             else { return }
-            
+             
             let visionModel = try VNCoreMLModel(for: model.model)
             let segmentationRequest = VNCoreMLRequest(
                 model: visionModel,
@@ -349,6 +316,8 @@ extension ContentViewModel {
                 let classIdx = getIndex(4 + j, i)
                 classScores[j] = pointer[classIdx]
             }
+            
+//            var label = output.
 
             var highestScore: Float = 0
             var classIndex: vDSP_Length = 0
@@ -374,6 +343,8 @@ extension ContentViewModel {
                     xyxy: .init(x1: left, y1: top, x2: right, y2: bottom),
                     maskCoefficients: maskCoefficients,
                     inputImgSize: inputImgSize
+//                    ,
+//                    label:
                 )
 
                 resultsQueue.async(flags: .barrier) {

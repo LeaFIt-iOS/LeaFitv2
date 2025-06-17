@@ -16,14 +16,16 @@ import CoreML
 class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
     let session = AVCaptureSession()
     private let output = AVCapturePhotoOutput()
-    private var isConfigured = false
     private var model: VNCoreMLModel?
+    private var device: AVCaptureDevice?
+    private var isConfigured: Bool = false
     
     @Published var isAloeDetected: Bool = false
-    @Published var isCapturing = false
+    @Published var isCapturing: Bool = false
     @Published var capturedImage: UIImage?
     @Published var originalImage: UIImage?
-    @Published var isSessionRunning = false
+    @Published var isSessionRunning: Bool = false
+    @Published var isTorchOn: Bool = false
     
     override init() {
         super.init()
@@ -42,7 +44,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     private func setupCamera() {
         session.beginConfiguration()
         session.sessionPreset = .photo
-
+        
         guard let camera = AVCaptureDevice.default(for: .video),
               let input = try? AVCaptureDeviceInput(device: camera),
               session.canAddInput(input) else {
@@ -50,27 +52,27 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             session.commitConfiguration()
             return
         }
-
+        
         session.addInput(input)
-
+        
         // ✅ Add photo output
         if session.canAddOutput(output) {
             session.addOutput(output)
         } else {
             print("❌ Cannot add photo output")
         }
-
+        
         // ✅ Add video output for real-time classification
         let videoOutput = AVCaptureVideoDataOutput()
         videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "videoQueue"))
         videoOutput.alwaysDiscardsLateVideoFrames = true
-
+        
         if session.canAddOutput(videoOutput) {
             session.addOutput(videoOutput)
         } else {
             print("❌ Cannot add video output")
         }
-
+        
         session.commitConfiguration()
         Task {
             self.session.startRunning()
@@ -105,20 +107,17 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     func capturePhoto() {
         guard !isCapturing else {
-            print("📸 Skipping: Already capturing")
             return
         }
-
-        print("📸 Triggering photo capture")
-
+        
         isCapturing = true
-
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             if self.isCapturing {
                 self.isCapturing = false
             }
         }
-
+        
         let settings = AVCapturePhotoSettings()
         output.capturePhoto(with: settings, delegate: self)
     }
@@ -126,17 +125,15 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     func photoOutput(_ output: AVCapturePhotoOutput,
                      didFinishProcessingPhoto photo: AVCapturePhoto,
                      error: Error?) {
-        print("📸 Photo delegate called")
-
         guard let data = photo.fileDataRepresentation(),
               let rawImage = UIImage(data: data) else {
             print("❌ Could not get image data")
             isCapturing = false
             return
         }
-
+        
         let orientedImage = fixOrientation(for: rawImage)
-
+        
         removeBackground(from: orientedImage) { [weak self] result in
             DispatchQueue.main.async {
                 self?.originalImage = orientedImage
@@ -177,6 +174,26 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             if !self.session.isRunning {
                 self.startSession()
             }
+        }
+    }
+    
+    func toggleTorch(on: Bool) {
+        guard let device = AVCaptureDevice.default(for: .video),
+              device.hasTorch else { return }
+        
+        do {
+            try device.lockForConfiguration()
+            
+            if on {
+                try device.setTorchModeOn(level: 1.0)
+            } else {
+                device.torchMode = .off
+            }
+            
+            device.unlockForConfiguration()
+            isTorchOn = on
+        } catch {
+            print("Torch could not be used")
         }
     }
     
@@ -228,7 +245,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             } catch {
                 print("❌ Vision error: \(error.localizedDescription) — returning original")
             }
-
+            
             completion(inputImage)
         }
     }

@@ -14,6 +14,7 @@ import CoreImage.CIFilterBuiltins
 
 struct CameraView: View {
     @State private var capturedImage: UIImage? = nil
+    @State private var showCaptureAlert: Bool = false
     @StateObject private var viewModel = CameraViewModel()
     @Environment(\.dismiss) var dismiss
     
@@ -44,6 +45,7 @@ struct CameraView: View {
                     ZStack {
                         Rectangle()
                             .foregroundColor(.black.opacity(0.5))
+                        
                         Rectangle()
                             .blendMode(.destinationOut)
                             .overlay(
@@ -54,8 +56,18 @@ struct CameraView: View {
                                 
                             )
                             .aspectRatio(1.0, contentMode: .fit)
-                            .cornerRadius(30)
+                            .cornerRadius(40)
                             .padding(.horizontal, 40)
+                        
+                        VStack {
+                                Text(viewModel.isAloeDetected ? "Aloe Found!" : "Aloe Not Found!")
+                                    .font(.system(size: 26, weight: .bold))
+                                    .foregroundColor(viewModel.isAloeDetected ? LeaFitColors.primary : .white)
+                                    .padding(.top, 40)
+
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                     .compositingGroup()
                     .padding(.bottom, 80)
@@ -63,12 +75,15 @@ struct CameraView: View {
                     VStack {
                         Spacer()
                         
-                        HStack {
+                        HStack() {
                             Spacer()
                             
                             Button(action: {
-                                print("📱 Button tapped")
-                                viewModel.capturePhoto()
+                                if viewModel.isAloeDetected {
+                                    viewModel.capturePhoto()
+                                } else {
+                                    showCaptureAlert = true
+                                }
                             }) {
                                 Circle()
                                     .fill(Color.white)
@@ -78,9 +93,19 @@ struct CameraView: View {
                                     )
                             }
                             
-                            Spacer()
+                            Button(action: {
+                                print("!viewModel.isTorchOn: \(!viewModel.isTorchOn)")
+                                viewModel.toggleTorch(on: !viewModel.isTorchOn)
+                            }) {
+                                Image(systemName: viewModel.isTorchOn ? "bolt.fill" : "bolt.slash")
+                                    .font(.system(size: 24))
+                                    .padding()
+                                    .background(Circle().fill(Color.white.opacity(0.8)))
+                            }
+                            .padding(.leading, 90)
                         }
                         .padding(.vertical, 40)
+                        .padding(.horizontal, 10)
                         .background(Color.black)
                     }
                     
@@ -109,6 +134,11 @@ struct CameraView: View {
                         }
                     }
                 }
+                .alert("Sorry, aloe vera not found!", isPresented: $showCaptureAlert) {
+                    Button("Retake", role: .cancel) { }
+                } message: {
+                    Text("Please take a photo in when bounding box is green.")
+                }
             }
         }
         .background(Color.black)
@@ -132,14 +162,14 @@ struct CameraView: View {
 
 struct CameraPreview: UIViewRepresentable {
     let session: AVCaptureSession
-
+    
     func makeUIView(context: Context) -> CameraPreviewView {
         let view = CameraPreviewView()
         view.videoPreviewLayer.session = session
         view.videoPreviewLayer.videoGravity = .resizeAspectFill
         return view
     }
-
+    
     func updateUIView(_ uiView: CameraPreviewView, context: Context) {
         uiView.videoPreviewLayer.connection?.videoOrientation = .portrait
     }
@@ -149,7 +179,7 @@ final class CameraPreviewView: UIView {
     override class var layerClass: AnyClass {
         return AVCaptureVideoPreviewLayer.self
     }
-
+    
     var videoPreviewLayer: AVCaptureVideoPreviewLayer {
         return layer as! AVCaptureVideoPreviewLayer
     }

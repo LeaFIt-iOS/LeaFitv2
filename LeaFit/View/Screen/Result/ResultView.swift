@@ -16,12 +16,6 @@ struct ResultView: View {
     @State var showTreatmentExplanation = false
     @StateObject var viewModel: ContentViewModel
     
-    private let treatments: [String] = [
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
-    ]
-    
     var body: some View {
         switch viewModel.predictionState {
         case .processing:
@@ -92,12 +86,11 @@ struct ResultView: View {
                                             }
                                         }
                                         
+                                        Divider()
                                         
                                         Text("This prediction is based solely on the image and may not be accurate. For a definitive diagnosis and further information, please consult an expert or conduct additional research independently.")
                                             .font(.system(size: 14, weight: .regular, design: .default))
                                             .foregroundColor(LeaFitColors.textGrey)
-                                        
-                                        Divider()
                                     }
                                     .padding()
                                 }
@@ -118,15 +111,24 @@ struct ResultView: View {
                                 VStack(alignment: .leading) {
                                     Divider()
                                     
-                                    Text("This prediction is based solely on the image and may not be accurate. For a definitive diagnosis and further information, please consult an expert or conduct additional research independently.")
-                                        .font(.system(size: 14, weight: .regular, design: .default))
-                                        .foregroundColor(LeaFitColors.textGrey)
-                                        .padding()
+                                    ForEach(Array(viewModel.highestScores.sorted(by: { $0.value > $1.value })), id: \.key) { score in
+                                        if let matchedItem = diseases.first(where: { $0.diseaseId == score.key }) {
+                                            VStack(alignment: .leading, spacing: 12) {
+                                                Text("[\(matchedItem.nameDisease)]")
+                                                    .font(.system(size: 14, weight: .bold, design: .default))
+                                                    .padding(.top)
+                                                
+                                                Text(matchedItem.explanation)
+                                                    .font(.system(size: 14, weight: .regular, design: .default))
+                                            }
+                                            .padding(.horizontal)
+                                        }
+                                    }
                                 }
                                 .padding(.top, 4)
                             },
                             label: {
-                                Text("What is [Decease]")
+                                Text("About These Diseases")
                                     .font(.system(size: 24, weight: .semibold, design: .default))
                             }
                         )
@@ -140,16 +142,56 @@ struct ResultView: View {
                                 VStack(alignment: .leading) {
                                     Divider()
                                     
-                                    ForEach(treatments, id: \.self) { treatment in
-                                        VStack {
-                                            Text(treatment)
-                                                .font(.system(size: 14, weight: .regular, design: .default))
-                                            
-                                            Divider()
+                                    ForEach(Array(viewModel.highestScores.sorted(by: { $0.value > $1.value })), id: \.key) { score in
+                                        if let matchedItem = diseases.first(where: { $0.diseaseId == score.key }) {
+                                            VStack(alignment: .leading, spacing: 12) {
+                                                Text("[\(matchedItem.nameDisease)]")
+                                                    .font(.system(size: 14, weight: .bold, design: .default))
+                                                    .padding(.top)
+                                                
+                                                Text("Prevention : ")
+                                                    .font(.system(size: 14, weight: .semibold, design: .default))
+                                                
+                                                ForEach(matchedItem.prevention, id: \.preventionTitle) { prevention in
+                                                    Text(prevention.preventionTitle)
+                                                        .font(.system(size: 12, weight: .semibold, design: .default))
+                                                    
+                                                    Text(prevention.preventionDetail)
+                                                        .font(.system(size: 10, weight: .regular, design: .default))
+                                                }
+                                                
+                                                Text("Watering : ")
+                                                    .font(.system(size: 14, weight: .semibold, design: .default))
+                                                
+                                                ForEach(matchedItem.watering, id: \.wateringTips) { watering in
+                                                    ForEach(watering.wateringCondition, id: \.condition) { wateringCondition in
+                                                        Text("\(wateringCondition.condition) - \(wateringCondition.wateringFrequency) (Frequency) - \(wateringCondition.wateringVolume) (Volume) - \(wateringCondition.wateringNote) (Note)")
+                                                            .font(.system(size: 12, weight: .semibold, design: .default))
+                                                    }
+                                                    
+                                                    Text(watering.wateringTips)
+                                                        .font(.system(size: 10, weight: .semibold, design: .default))
+                                                }
+                                                
+                                                
+                                                Text("Drying : ")
+                                                    .font(.system(size: 14, weight: .semibold, design: .default))
+                                                
+                                                ForEach(matchedItem.drying, id: \.dryingTips) { drying in
+                                                    ForEach(drying.dryingCondition, id: \.plantCondition) { dryingCondition in
+                                                        Text("\(dryingCondition.plantCondition) - \(dryingCondition.dryingDuration) (Duration) - \(dryingCondition.dryingBestTime) (Best Time) - \(dryingCondition.dryingNote) (Note)")
+                                                            .font(.system(size: 12, weight: .semibold, design: .default))
+                                                    }
+                                                    
+                                                    Text(drying.dryingTips)
+                                                        .font(.system(size: 10, weight: .semibold, design: .default))
+                                                }
+                                                
+                                                Divider()
+                                            }
+                                            .padding(.horizontal)
                                         }
-                                        .padding(.vertical, 8)
                                     }
-                                    
                                 }
                                 .padding(.top, 4)
                             },
@@ -162,12 +204,11 @@ struct ResultView: View {
                         .background(RoundedRectangle(cornerRadius: 15).fill(LeaFitColors.light))
                         .accentColor(LeaFitColors.primary)
                     }
-                    
                 }
                 .navigationBarBackButtonHidden(true)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: ResultDetailView()) {
+                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!)) {
                             Text("Next")
                         }
                     }
@@ -214,7 +255,7 @@ struct ResultView: View {
                 .navigationBarBackButtonHidden(true)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: ResultDetailView()) {
+                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!)) {
                             Text("Next")
                         }
                     }
@@ -226,7 +267,7 @@ struct ResultView: View {
             }
             
         }
-            
+        
     }
     
     

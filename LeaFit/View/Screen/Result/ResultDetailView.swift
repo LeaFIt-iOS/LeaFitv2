@@ -8,16 +8,16 @@
 import SwiftUI
 
 struct ResultDetailView: View {
-    @State private var date = Date()
-    @State private var notes: String = ""
+    private var originalImage: UIImage
+    private var resultImage: UIImage
     
-    enum Pots: String, CaseIterable, Identifiable {
-        case Pot1, Pot2, Pot3
-        var id: Self { self }
+    init(originalImage: UIImage, resultImage: UIImage) {
+        self.originalImage = originalImage
+        self.resultImage = resultImage
     }
     
+    @State private var viewModel: ResultDetailViewModel = ResultDetailViewModel()
     
-    @State private var selectedPot: Pots = .Pot1
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -25,11 +25,19 @@ struct ResultDetailView: View {
                 TabView {
                     RoundedRectangle(cornerRadius: 25)
                         .fill(Color.gray)
+                        .opacity(0.2)
                         .frame(height: 393)
+                        .overlay(
+                            Image(uiImage: originalImage).resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: 393)
+                        )
                     
                     RoundedRectangle(cornerRadius: 25)
                         .fill(Color.gray)
+                        .opacity(0.2)
                         .frame(height: 393)
+                        .overlay(
+                            Image(uiImage: resultImage).resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: 393)
+                        )
                 }
                 .frame(height: 393)
                 .tabViewStyle(.page)
@@ -41,15 +49,15 @@ struct ResultDetailView: View {
                         VStack(alignment: .leading) {
                             DatePicker(
                                 "Time",
-                                selection: $date,
+                                selection: $viewModel.date,
                                 displayedComponents: [.date]
                             )
                             
                             Divider()
                             
                             List {
-                                Picker(selection: $selectedPot) {
-                                    ForEach(Pots.allCases) { pot in
+                                Picker(selection: $viewModel.selectedPot) {
+                                    ForEach(viewModel.pots, id: \.self) { pot in
                                         Text(pot.rawValue.capitalized)
                                     }
                                 } label: {
@@ -62,7 +70,7 @@ struct ResultDetailView: View {
                             HStack {
                                 Text("Notes")
                                 
-                                TextField(text: $notes) {
+                                TextField(text: $viewModel.notes) {
                                     Text("Add Notes")
                                 }
                                 .multilineTextAlignment(.trailing)
@@ -88,8 +96,4 @@ struct ResultDetailView: View {
         .background(LeaFitColors.background)
 
     }
-}
-
-#Preview {
-    ResultDetailView()
 }

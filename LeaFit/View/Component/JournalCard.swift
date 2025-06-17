@@ -14,33 +14,36 @@ struct JournalCard: View {
     let isFirst: Bool
     let isLast: Bool
     
-    
     var formattedDate: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy h:mm a"
         return formatter.string(from: date)
     }
     
+    var diseaseColor: Color {
+        let disease = self.disease.lowercased()
+        
+        switch true {
+        case disease.contains("anthracnose"):
+            return Color(hex: "F40654")
+        case disease.contains("rot"):
+            return Color(hex: "7D28F7")
+        case disease.contains("rust"):
+            return Color(hex: "01FED0")
+        case disease.contains("sunburn"):
+            return Color(hex: "FF7E00")
+        default:
+            return Color.green
+        }
+    }
+    
     var body: some View {
-        ZStack(alignment: .trailing) {
+        ZStack(alignment: .leading) {
             HStack {
-                ZStack {
-                    VStack { //garis vertikal antar card
-                        Rectangle()
-                            .fill(Color(hex: "428D6D").opacity(0.5))
-                            .frame(width: 2)
-                            .opacity(isFirst ? 0 : 1)
-                        Spacer()
-                        Rectangle()
-                            .fill(Color(hex: "428D6D").opacity(0.5))
-                            .frame(width: 2)
-                            .opacity(isLast ? 0 : 1)
-                    }
-                    
-                    Image(systemName: "circlebadge")
-                        .foregroundColor(LeaFitColors.primary)
-                }
-                                
+                
+                Spacer()
+                    .frame(width: 30)
+                
                 Image(image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -49,10 +52,8 @@ struct JournalCard: View {
                     .cornerRadius(16)
                     .padding(.horizontal)
                 
-                Spacer()
-                
                 VStack(alignment: .leading, spacing: 4) {
-                    // Disease title and (x others)
+                    
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(disease.components(separatedBy: " (").first ?? disease)
@@ -66,7 +67,6 @@ struct JournalCard: View {
                                     .font(.subheadline)
                                     .foregroundColor(LeaFitColors.primary)
                                     .lineLimit(1)
-                                
                             }
                         }
                         Spacer()
@@ -82,21 +82,53 @@ struct JournalCard: View {
                 }
                 .frame(height: 90)
                 
-                Color.red
-                    .frame(width: 10, height: 120)
+                Spacer()
+                
+                
+                diseaseColor
+                    .frame(width: 15, height: 120)
                     .cornerRadius(5, corners: [.topRight, .bottomRight])
             }
-            .padding(.leading, 17)
-            .frame(height: 120) // biar ga layout shifting
+            .frame(height: 120)
             .background(LeaFitColors.light)
-            .cornerRadius(20)
+            .cornerRadius(10)
             .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 4)
+            
+            
+            HStack {
+                ZStack {
+                    VStack {
+                        
+                        Rectangle()
+                            .fill(Color(hex: "428D6D").opacity(0.5))
+                            .frame(width: 2, height: 62)
+                            .opacity(isFirst ? 0 : 1)
+                        
+                        Spacer() // pakein ini biar si time line nya ga dorong ke antar line, instead ke dalam circle (jdi bisa di-adjust)
+                        
+                        Rectangle()
+                            .fill(Color(hex: "428D6D").opacity(0.5))
+                            .frame(width: 2, height: 62)
+                            .opacity(isLast ? 0 : 1)
+                    }
+                    .frame(height: 140)
+                    
+                    
+                    Image(systemName: "circlebadge")
+                        .foregroundColor(LeaFitColors.primary)
+                        .font(.title2)
+                    
+                }
+                .frame(width: 45)
+                
+                Spacer()
+            }
         }
         .padding(.horizontal)
     }
 }
 
-
+// Keep your existing extensions
 struct RoundedCorner: Shape {
     var radius: CGFloat = 0
     var corners: UIRectCorner = .allCorners
@@ -111,7 +143,6 @@ struct RoundedCorner: Shape {
     }
 }
 
-
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
         clipShape(RoundedCorner(radius: radius, corners: corners))
@@ -120,7 +151,7 @@ extension View {
 
 // Preview
 #Preview {
-    VStack(spacing: 16) {
+    VStack(spacing: 0) {
         JournalCard(
             image: "aloe_sample",
             disease: "Anthracnose",
@@ -131,7 +162,7 @@ extension View {
         
         JournalCard(
             image: "aloe_sample",
-            disease: "Anthracnose (2 others)",
+            disease: "Rot (2 others)",
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 16, hour: 14, minute: 20))!,
             isFirst: false,
             isLast: false
@@ -140,6 +171,13 @@ extension View {
         JournalCard(
             image: "aloe_sample",
             disease: "Very Long Disease Name That Might Cause Layout Issues (3 others)",
+            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 8, minute: 15))!,
+            isFirst: false,
+            isLast: false
+        )
+        JournalCard(
+            image: "aloe_sample",
+            disease: "Sunburn Cok",
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 8, minute: 15))!,
             isFirst: false,
             isLast: true

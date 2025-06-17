@@ -34,13 +34,17 @@ struct JournalEntry: Identifiable {
             return "\(primary.key) (\(othersCount) others)"
         }
     }
-
 }
 
 struct JournalView: View {
         
     // Dummy data
     @State private var journalEntries: [JournalEntry] = [
+        JournalEntry(
+            image: "aloe_sample",
+            diseases: ["kocak": 0.81],
+            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 11, hour: 15, minute: 30))!
+        ),
         JournalEntry(
             image: "aloe_sample",
             diseases: ["Anthracnose": 0.85, "Leaf Spot": 0.12],
@@ -73,7 +77,7 @@ struct JournalView: View {
         ),
         JournalEntry(
             image: "aloe_sample",
-            diseases: ["kocak": 0.81],
+            diseases: ["Rot": 0.81],
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 11, hour: 15, minute: 30))!
         )
     ]
@@ -86,16 +90,18 @@ struct JournalView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVStack(spacing: 16) {
+                LazyVStack { // Back to spacing: 16
                     ForEach(Array(sortedEntries.enumerated()), id: \.element.id) { index, entry in
                         JournalCard(
                             image: entry.image,
                             disease: entry.diseaseDisplayText,
                             date: entry.date,
+                            
                             isFirst: index == 0,
                             isLast: index == sortedEntries.count - 1
                         )
-                    }                }
+                    }
+                }
                 .padding(.top, 20)
             }
             .navigationTitle("[Nama Pot] ntar diubah yah bentar")

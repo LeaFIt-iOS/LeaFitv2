@@ -22,16 +22,19 @@ struct CameraView: View {
             if let image = capturedImage {
                 CameraResultView(
                     image: image,
+                    originalImage: viewModel.originalImage!,
                     onRetake: {
                         withAnimation {
                             capturedImage = nil
+                            
                             viewModel.reset()
                         }
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             viewModel.startSession()
                         }
-                    }
+                    },
+                    detectionViewModel: ContentViewModel()
                 )
             } else {
                 ZStack {

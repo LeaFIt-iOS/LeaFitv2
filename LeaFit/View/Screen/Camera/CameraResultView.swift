@@ -9,7 +9,10 @@ import SwiftUI
 
 struct CameraResultView: View {
     var image: UIImage
+    var originalImage: UIImage
     var onRetake: @MainActor () -> Void
+    
+    @StateObject var detectionViewModel: ContentViewModel
     
     var body: some View {
         VStack {
@@ -22,14 +25,28 @@ struct CameraResultView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: ResultView(image: image)) {
-                    Text("Next")
-                }
+                
+//                    Button("Next") {
+                        
+                        NavigationLink(destination: ResultView(image: image, originalImage: originalImage, viewModel: detectionViewModel)) {
+                            Text("Next")
+                        }
+//                        .onSubmit  {
+//                            detectionViewModel.addImage(image)
+////                            Task {
+////                                await detectionViewModel.runInference()
+////                            }
+//                        }
+                    
+//                }
             }
             
             ToolbarItem(placement: .navigationBarLeading) {
                 Button("Retake", action: onRetake)
             }
+        }
+        .onDisappear {
+            detectionViewModel.addImage(image)
         }
     }
 }

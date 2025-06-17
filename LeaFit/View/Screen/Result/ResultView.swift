@@ -10,7 +10,7 @@ import SwiftUI
 struct ResultView: View {
     var image: UIImage
     var originalImage: UIImage
-
+    
     @State var showDiagnose = true
     @State var showDiagnoseExplanation = false
     @State var showTreatmentExplanation = false
@@ -23,164 +23,210 @@ struct ResultView: View {
     ]
     
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack {
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(LeaFitColors.light)
-                    .frame(height: 224)
-                    .overlay(
-                        HStack(spacing: 16) {
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.gray)
-                                .opacity(0.2)
-                                .frame(width: 175, height: 175)
-                                .overlay(Image(uiImage: originalImage).resizable().scaledToFit().frame(width: 175, height: 175))
-                            
-                            
-                            
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.gray)
-                                .opacity(0.2)
-                                .frame(width: 175, height: 175)
-                                .onTapGesture {
-                                    Task {
-                                        await viewModel.runInference()
-                                    }
-                                }
-                                .overlay(
-                                        Group{
-                                            if let uiImage = viewModel.combinedMaskImage {
+        switch viewModel.predictionState {
+        case .processing:
+            ProgressView("Processing...")
+                .progressViewStyle(CircularProgressViewStyle(tint: LeaFitColors.primary))
+                .foregroundColor(LeaFitColors.primary)
+                .navigationBarBackButtonHidden(true)
+                .accentColor(LeaFitColors.primary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(LeaFitColors.background)
+        case .finished:
+            if viewModel.highestScores != [:]{
+                ScrollView(showsIndicators: false) {
+                    VStack {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(LeaFitColors.light)
+                            .frame(height: 224)
+                            .overlay(
+                                HStack(spacing: 16) {
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .fill(Color.gray)
+                                        .opacity(0.2)
+                                        .frame(width: 175, height: 175)
+                                        .overlay(Image(uiImage: originalImage).resizable().scaledToFit().frame(width: 175, height: 175))
+                                    
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .fill(Color.gray)
+                                        .opacity(0.2)
+                                        .frame(width: 175, height: 175)
+                                        .overlay(
+                                            Group {
                                                 Image(uiImage: viewModel.uiImage!)
                                                     .resizable()
                                                     .scaledToFit()
                                                     .aspectRatio(contentMode: .fit)
-                                                //                                        }
-                                            } else {
-                                                ProgressView()
+                                            }
+                                                .overlay(
+                                                    buildMaskImage(mask: viewModel.combinedMaskImage)
+                                                        .opacity(0.7))
+                                                .overlay(
+                                                    DetectionViewRepresentable(
+                                                        predictions: $viewModel.predictions)
+                                                    .opacity(0))
+                                        )
+                                }
+                            )
+                        
+                        DisclosureGroup(
+                            isExpanded: $showDiagnose,
+                            content: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Divider()
+                                    
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        ForEach(Array(viewModel.highestScores.sorted(by: { $0.value > $1.value })), id: \.key) { diseaseId, score in
+                                            Text("\(String(format: "%.2f", score * 100))%")
+                                                .font(.system(size: 48, weight: .bold, design: .default))
+                                                .foregroundColor(LeaFitColors.green)
+                                            
+                                            HStack {
+                                                Circle()
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundColor(LeaFitColors.green)
+                                                
+                                                Text(diseaseId)
+                                                    .font(.system(size: 17, weight: .semibold, design: .default))
+                                                    .foregroundColor(LeaFitColors.primary)
                                             }
                                         }
-                                        .overlay(
-                                            buildMaskImage(mask: viewModel.combinedMaskImage)
-                                                .opacity(0.7))
-                                        .overlay(
-                                            DetectionViewRepresentable(
-                                                predictions: $viewModel.predictions)
-                                            .opacity(0))
-                                )
-                        }
-                    )
-                
-                DisclosureGroup(
-                    isExpanded: $showDiagnose,
-                    content: {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Divider()
-                            
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("70%")
-                                    .font(.system(size: 48, weight: .bold, design: .default))
-                                    .foregroundColor(LeaFitColors.green)
-                                
-                                HStack {
-                                    Circle()
-                                        .frame(width: 30, height: 30)
-                                        .foregroundColor(LeaFitColors.green)
-                                    
-                                    Text("[Disease Name]")
-                                        .font(.system(size: 17, weight: .semibold, design: .default))
-                                        .foregroundColor(LeaFitColors.primary)
+                                        
+                                        
+                                        Text("This prediction is based solely on the image and may not be accurate. For a definitive diagnosis and further information, please consult an expert or conduct additional research independently.")
+                                            .font(.system(size: 14, weight: .regular, design: .default))
+                                            .foregroundColor(LeaFitColors.textGrey)
+                                        
+                                        Divider()
+                                    }
+                                    .padding()
                                 }
-                                
-                                Text("This prediction is based solely on the image and may not be accurate. For a definitive diagnosis and further information, please consult an expert or conduct additional research independently.")
-                                    .font(.system(size: 14, weight: .regular, design: .default))
-                                    .foregroundColor(LeaFitColors.textGrey)
-                                
-                                Divider()
+                                .padding(.top, 4)
+                            },
+                            label: {
+                                Text("Diagnosa")
+                                    .font(.system(size: 24, weight: .semibold, design: .default))
                             }
-                            .padding()
-                        }
-                        .padding(.top, 4)
-                    },
-                    label: {
-                        Text("Diagnosa")
-                            .font(.system(size: 24, weight: .semibold, design: .default))
-                    }
-                )
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 15).fill(LeaFitColors.light))
-                .accentColor(LeaFitColors.primary)
-                
-                DisclosureGroup(
-                    isExpanded: $showDiagnoseExplanation,
-                    content: {
-                        VStack(alignment: .leading) {
-                            Divider()
-                            
-                            Text("This prediction is based solely on the image and may not be accurate. For a definitive diagnosis and further information, please consult an expert or conduct additional research independently.")
-                                .font(.system(size: 14, weight: .regular, design: .default))
-                                .foregroundColor(LeaFitColors.textGrey)
-                                .padding()
-                        }
-                        .padding(.top, 4)
-                    },
-                    label: {
-                        Text("What is [Decease]")
-                            .font(.system(size: 24, weight: .semibold, design: .default))
-                    }
-                )
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 15).fill(LeaFitColors.light))
-                .accentColor(LeaFitColors.primary)
-                
-                DisclosureGroup(
-                    isExpanded: $showTreatmentExplanation,
-                    content: {
-                        VStack(alignment: .leading) {
-                            Divider()
-                            
-                            ForEach(treatments, id: \.self) { treatment in
-                                VStack {
-                                    Text(treatment)
-                                        .font(.system(size: 14, weight: .regular, design: .default))
-                                    
+                        )
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 15).fill(LeaFitColors.light))
+                        .accentColor(LeaFitColors.primary)
+                        
+                        DisclosureGroup(
+                            isExpanded: $showDiagnoseExplanation,
+                            content: {
+                                VStack(alignment: .leading) {
                                     Divider()
+                                    
+                                    Text("This prediction is based solely on the image and may not be accurate. For a definitive diagnosis and further information, please consult an expert or conduct additional research independently.")
+                                        .font(.system(size: 14, weight: .regular, design: .default))
+                                        .foregroundColor(LeaFitColors.textGrey)
+                                        .padding()
                                 }
-                                .padding(.vertical, 8)
+                                .padding(.top, 4)
+                            },
+                            label: {
+                                Text("What is [Decease]")
+                                    .font(.system(size: 24, weight: .semibold, design: .default))
                             }
-                            
-                        }
-                        .padding(.top, 4)
-                    },
-                    label: {
-                        Text("Treatment")
-                            .font(.system(size: 24, weight: .semibold, design: .default))
+                        )
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 15).fill(LeaFitColors.light))
+                        .accentColor(LeaFitColors.primary)
+                        
+                        DisclosureGroup(
+                            isExpanded: $showTreatmentExplanation,
+                            content: {
+                                VStack(alignment: .leading) {
+                                    Divider()
+                                    
+                                    ForEach(treatments, id: \.self) { treatment in
+                                        VStack {
+                                            Text(treatment)
+                                                .font(.system(size: 14, weight: .regular, design: .default))
+                                            
+                                            Divider()
+                                        }
+                                        .padding(.vertical, 8)
+                                    }
+                                    
+                                }
+                                .padding(.top, 4)
+                            },
+                            label: {
+                                Text("Treatment")
+                                    .font(.system(size: 24, weight: .semibold, design: .default))
+                            }
+                        )
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 15).fill(LeaFitColors.light))
+                        .accentColor(LeaFitColors.primary)
                     }
-                )
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 15).fill(LeaFitColors.light))
-                .accentColor(LeaFitColors.primary)
-            }
-        }
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: ResultDetailView()) {
-                    Text("Next")
+                    
                 }
+                .navigationBarBackButtonHidden(true)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: ResultDetailView()) {
+                            Text("Next")
+                        }
+                    }
+                }
+                .accentColor(LeaFitColors.primary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(LeaFitColors.background)
+                
+            } else {
+                ScrollView(showsIndicators: false) {
+                    VStack {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(LeaFitColors.light)
+                            .frame(height: 224)
+                            .overlay(
+                                HStack(spacing: 16) {
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .fill(Color.gray)
+                                        .opacity(0.2)
+                                        .frame(width: 175, height: 175)
+                                        .overlay(Image(uiImage: originalImage).resizable().scaledToFit().frame(width: 175, height: 175))
+                                    
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .fill(Color.gray)
+                                        .opacity(0.2)
+                                        .frame(width: 175, height: 175)
+                                        .overlay(
+                                            Group{
+                                                if let a = viewModel.uiImage {
+                                                    Image(uiImage: a)
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .aspectRatio(contentMode: .fit)
+                                                } else {
+                                                    Text("Nothing to show")
+                                                }
+                                            }
+                                        )
+                                }
+                            )
+                        Text("Healthy yey")
+                    }
+                }
+                .navigationBarBackButtonHidden(true)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: ResultDetailView()) {
+                            Text("Next")
+                        }
+                    }
+                }
+                .accentColor(LeaFitColors.primary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(LeaFitColors.background)
+                
             }
-        }
-        .accentColor(LeaFitColors.primary)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(LeaFitColors.background)
-        .onAppear {
             
-            viewModel.addImage(image)
         }
-//        .onChange(of: viewModel.uiImage) { oldValue, newValue in
-//            Task {
-//                await viewModel.runInference()
-//            }
-//        }
+            
     }
     
     

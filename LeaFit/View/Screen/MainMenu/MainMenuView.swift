@@ -20,7 +20,6 @@ struct MainMenuView: View {
                 ZStack {
                     Image("img-framejendela")
                         .padding(.top, 70)
-                    
                     VStack(spacing: -80) {
                         ForEach(Array(groupedCategories.enumerated()), id: \.offset) { _, group in
                             ZStack {

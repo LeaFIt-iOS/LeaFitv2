@@ -185,6 +185,7 @@ extension ContentViewModel {
             )
             
             NSLog("Got \(predictions.count) predicted boxes")
+//            NSLog("Scores: \(predictions.map(\.score).map(\.rounded(.down)))")
             
             await setStatus(to: .performingNMS)
             

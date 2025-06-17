@@ -20,6 +20,18 @@ enum Status {
     case generateMasksFromProtos
 }
 
+enum PredictionStatus {
+    case processing
+    case finished
+}
+
+let className = [
+    "anthracnose",
+    "rot",
+    "rust",
+    "sunburn"
+]
+
 extension Status {
     var message: String {
         switch self {
@@ -46,6 +58,8 @@ class ContentViewModel: ObservableObject {
     
     var cancellables = Set<AnyCancellable>()
     
+    @Published var predictionState: PredictionStatus = .processing
+    
     @Published var imageSelection: PhotosPickerItem?
     @Published var uiImage: UIImage?
     
@@ -62,6 +76,8 @@ class ContentViewModel: ObservableObject {
     
     @MainActor @Published var status: Status? = nil
     
+    @Published var highestScores: [String: Float] = [:]
+    
     init() {
         setupBindings()
     }
@@ -71,73 +87,40 @@ class ContentViewModel: ObservableObject {
         Task {
             await runInference()
         }
-        $maskPredictions.sink { [weak self] predictions in
-            guard !predictions.isEmpty else { return }
-            
-            self?.combinedMaskImage = predictions.combineToSingleImage()
-            
-            print("i was here")
-        }.store(in: &cancellables)
     }
-    
-//    func addImage(_ image: UIImage) {
-//        Task {
-//            await MainActor.run {
-//                self.uiImage = image
-//                self.predictions = []
-//                self.maskPredictions = []
-//                self.combinedMaskImage = nil
-//            }
-//
-//            await runInference()
-//        }
-//        $maskPredictions.sink { [weak self] predictions in
-//            guard !predictions.isEmpty else { return }
-//            
-//            self?.combinedMaskImage = predictions.combineToSingleImage()
-//            
-//            print("i was here")
-//        }.store(in: &cancellables)
-//    }
-
         
     private func setupBindings() {
-//        $imageSelection.sink { [weak self] item in
-//            guard let item else { return }
-//            
-//            Task { [weak self] in
-//                
-//                if let data = try? await item.loadTransferable(type: Data.self) {
-//                    if let uiImage = UIImage(data: data) {
-//                        await MainActor.run { [weak self] in
-//                            self?.predictions = []
-//                            self?.maskPredictions = []
-//                            self?.combinedMaskImage = nil
-//                            self?.uiImage = uiImage
-//                        }
-//                        return
-//                    }
-//                }
-//            }
-//            
-//        }.store(in: &cancellables)
-        
         $maskPredictions.sink { [weak self] predictions in
-            guard !predictions.isEmpty else { return }
+            guard !predictions.isEmpty else {
+                return
+            }
             
             self?.combinedMaskImage = predictions.combineToSingleImage()
-            
-            print("i was here")
         }.store(in: &cancellables)
     }
     
     func runInference() async {
-        print("i am here runInference")
         await MainActor.run { [weak self] in
             self?.processing = true
         }
         await runVisionInference()
     }
+    
+    @MainActor func getDiseasesNames() {
+        highestScores = [:] // ✅ Clear previous state
+
+        for prediction in predictions {
+            let currentMax = highestScores[prediction.diseaseId] ?? 0
+            if prediction.score > currentMax {
+                highestScores[prediction.diseaseId] = prediction.score
+            }
+        }
+        
+        predictionState = .finished
+
+        print("✅ highestScores: \(highestScores)")
+    }
+
 }
 
 // MARK: Vision Inference
@@ -162,15 +145,22 @@ extension ContentViewModel {
             guard let boxesOutput = results[1, default: nil] as? VNCoreMLFeatureValueObservation,
                   let masksOutput = results[0, default: nil] as? VNCoreMLFeatureValueObservation
             else {
+                predictionState = .finished;
                 return
             }
             
             guard let boxes = boxesOutput.featureValue.multiArrayValue else {
+                predictionState = .finished;
                 return
             }
             
             let numSegmentationMasks = 32
             let numClasses = Int(truncating: boxes.shape[1]) - 4 - numSegmentationMasks
+
+            for res in results {
+                print("rconf \(res.confidence)")
+                print("\(res)")
+            }
             
             NSLog("Model has \(numClasses) classes")
             
@@ -189,13 +179,15 @@ extension ContentViewModel {
             
             await setStatus(to: .performingNMS)
             
-            guard !predictions.isEmpty else { return }
+            guard !predictions.isEmpty else { predictionState = .finished; return }
             
             NSLog("Perform non maximum suppression")
             
             let groupedPredictions = Dictionary(grouping: predictions) { prediction in
                 prediction.classIndex
             }
+            
+            print("grouped prediction \(groupedPredictions)")
             
             var nmsPredictions: [Prediction] = []
             let _ = groupedPredictions.mapValues { predictions in
@@ -209,15 +201,18 @@ extension ContentViewModel {
             NSLog("\(nmsPredictions.count) boxes left after performing nms with iou threshold of 0.6")
             
             guard !nmsPredictions.isEmpty else {
+                predictionState = .finished;
                 return
             }
             
             await MainActor.run { [weak self, nmsPredictions] in
                 self?.predictions = nmsPredictions
+                self?.getDiseasesNames()
             }
             
             guard let masks = masksOutput.featureValue.multiArrayValue else {
                 print("No masks output")
+                predictionState = .finished;
                 return
             }
             
@@ -254,6 +249,7 @@ extension ContentViewModel {
             await MainActor.run { [weak self] in
                 self?.processing = false
             }
+            predictionState = .finished;
             return
         }
         
@@ -267,14 +263,20 @@ extension ContentViewModel {
             
             guard let model = try? best(configuration: config) else {
                 print("failed to init model")
+                predictionState = .finished;
                 return
             }
             
             let inputDesc = model.model.modelDescription.inputDescriptionsByName
+            let classes = model.model.modelDescription.classLabels as? [String]
+            
             guard let imgInputDesc = inputDesc["image"],
                   let imgsz = imgInputDesc.imageConstraint
-            else { return }
-            
+            else {
+                predictionState = .finished;
+                return
+            }
+             
             let visionModel = try VNCoreMLModel(for: model.model)
             let segmentationRequest = VNCoreMLRequest(
                 model: visionModel,
@@ -298,7 +300,10 @@ extension ContentViewModel {
             print("Model loading went wrong: \(error)")
         }
         
-        guard let cgImage = uiImage.cgImage else { return }
+        guard let cgImage = uiImage.cgImage else {
+            predictionState = .finished;
+            return
+        }
         
         let imageRequestHandler = VNImageRequestHandler(
             cgImage: cgImage,
@@ -447,7 +452,10 @@ extension ContentViewModel {
                     maskProto.withUnsafeBufferPointer { protoBuffer in
                         guard let protoBase = protoBuffer.baseAddress,
                               let finalBase = finalMaskBuffer.baseAddress
-                        else { return }
+                        else {
+                            predictionState = .finished;
+                            return
+                        }
 
                         vDSP_vsma(protoBase, 1, &coeff, finalBase, 1, finalBase, 1, vDSP_Length(maskSize.width * maskSize.height))
                     }

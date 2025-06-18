@@ -18,6 +18,22 @@ struct SickPlantSection: View {
     
     @Binding var isFullScreen: Bool
     
+    private func displayColor(_ disease: String) -> Color {
+        let disease = disease.lowercased()
+        switch true {
+        case disease.contains("anthracnose"):
+            return LeaFitColors.anthracnose
+        case disease.contains("rot"):
+            return LeaFitColors.rot
+        case disease.contains("rust"):
+            return LeaFitColors.rust
+        case disease.contains("sunburn"):
+            return LeaFitColors.sunburn
+        default:
+            return Color.green
+        }
+    }
+    
     var body: some View {
         VStack {
             RoundedRectangle(cornerRadius: 15)
@@ -71,14 +87,14 @@ struct SickPlantSection: View {
                             ForEach(Array(viewModel.highestScores.sorted(by: { $0.value > $1.value })), id: \.key) { diseaseId, score in
                                 Text("\(String(format: "%.2f", score * 100))%")
                                     .font(.system(size: 48, weight: .bold, design: .default))
-                                    .foregroundColor(LeaFitColors.green)
+                                    .foregroundColor(displayColor(diseaseId))
                                 
                                 HStack {
                                     Circle()
                                         .frame(width: 30, height: 30)
-                                        .foregroundColor(LeaFitColors.green)
+                                        .foregroundColor(displayColor(diseaseId))
                                     
-                                    Text(diseaseId)
+                                    Text(diseaseId.capitalized)
                                         .font(.system(size: 17, weight: .semibold, design: .default))
                                         .foregroundColor(LeaFitColors.primary)
                                 }

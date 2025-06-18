@@ -26,13 +26,13 @@ struct JournalCard: View {
         
         switch true {
         case disease.contains("anthracnose"):
-            return Color(hex: "F40654")
+            return LeaFitColors.anthracnose
         case disease.contains("rot"):
-            return Color(hex: "7D28F7")
+            return LeaFitColors.rot
         case disease.contains("rust"):
-            return Color(hex: "01FED0")
+            return LeaFitColors.rust
         case disease.contains("sunburn"):
-            return Color(hex: "FF7E00")
+            return LeaFitColors.sunburn
         default:
             return Color.green
         }

@@ -93,8 +93,7 @@ struct LeafCardView: View {
 }
 
 struct JournalView: View {
-    @State private var selectedEntry: JournalEntry? = nil
-    @State private var showModality = false
+    @State private var selectedEntry: Leaf? = nil
     
     let pot: Pot?
     
@@ -189,29 +188,15 @@ struct JournalView: View {
         .onAppear {
             printSelectedPot()
         }
-        .sheet(isPresented: $showModality) {
-            if let entry = selectedEntry {
-                JournalResultModalView(entry: entry)
-            }
+        .sheet(item: $selectedEntry) { entry in
+            JournalResultModalView(entry: entry)
         }
     }
     
     // Extracted helper method
     private func handleLeafTap(_ leaf: Leaf) {
-        guard let originalImage = UIImage(data: leaf.originalImage) else { return }
-        guard let processedImage = UIImage(data: leaf.processedImage) else { return }
-        
-        let topDisease = getTopDisease(from: leaf.diagnose)
-        let diseases = createDiseaseDictionary(from: topDisease)
-        
-        selectedEntry = JournalEntry(
-            originalImage: originalImage,
-            processedImage: processedImage,
-            diseases: diseases,
-            date: leaf.dateCreated
-        )
-        showModality = true
-    }
+            selectedEntry = leaf
+        }
     
     // Helper method to get top disease
     private func getTopDisease(from diagnoses: [Diagnose]) -> Diagnose? {
@@ -245,6 +230,11 @@ struct JournalView: View {
     }
 }
 
+extension Leaf: Identifiable, Equatable {
+    static func == (lhs: Leaf, rhs: Leaf) -> Bool {
+        lhs.id == rhs.id
+    }
+}
 
 
 

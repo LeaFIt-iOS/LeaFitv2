@@ -31,7 +31,7 @@ class MainMenuViewModel: ObservableObject {
 
             if existing == 0 {
                 let initialCategories = [
-                    PlantCategory(imageName: "img-aloevera", title: "Aloe Vera", nameScientific: ""),
+                    PlantCategory(imageName: "img-aloevera", title: "Aloe Vera", nameScientific: "Aloevera"),
                     PlantCategory(imageName: "img-kaktus", title: "Cactus", nameScientific: ""),
                     PlantCategory(imageName: "img-rose", title: "Rose", nameScientific: ""),
                     PlantCategory(imageName: "img-monstera", title: "Monstera", nameScientific: ""),

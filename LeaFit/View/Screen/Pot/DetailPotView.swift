@@ -9,6 +9,7 @@ import SwiftUI
 import Foundation
 
 struct DetailPotView: View {
+    @Environment(\.modelContext) private var modelContext
     
         let pot: Pot
     

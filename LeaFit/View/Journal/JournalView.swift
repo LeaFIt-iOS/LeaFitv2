@@ -38,6 +38,7 @@ struct JournalEntry: Identifiable {
 
 struct JournalView: View {
         
+    let pot: Pot
     // Dummy data
     @State private var journalEntries: [JournalEntry] = [
         JournalEntry(
@@ -104,7 +105,8 @@ struct JournalView: View {
                 }
                 .padding(.top, 20)
             }
-            .navigationTitle("[Nama Pot] ntar diubah yah bentar")
+            
+            .navigationTitle(pot.namePot)
             .navigationBarTitleDisplayMode(.large)
             .background(LeaFitColors.background)
         }
@@ -122,5 +124,5 @@ struct JournalView: View {
 }
 
 #Preview {
-    JournalView()
+    JournalView(pot: Pot(id: UUID(), namePot: "My Aloe Plant", leaves: []))
 }

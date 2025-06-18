@@ -10,7 +10,11 @@
 import SwiftUI
 
 struct ImageCarousel: View {
-    let images: [UIImage]
+    let images: [Image]
+    let mask: UIImage?
+    
+    @Binding var predictions: [Prediction]
+    
     @State private var index: Int = 0
     @State private var scale: CGFloat = 1.0
     @State private var lastScale: CGFloat = 1.0
@@ -26,20 +30,44 @@ struct ImageCarousel: View {
             
             TabView(selection: $index) {
                 ForEach(images.indices, id: \.self) { i in
-                    Image(uiImage: images[i])
-                        .resizable()
-                        .scaledToFit()
-                        .scaleEffect(scale)
-                        .gesture(
-                            MagnificationGesture()
-                                .onChanged { value in
-                                    scale = max(1.0, lastScale * value)
-                                }
-                                .onEnded { _ in
-                                    lastScale = scale
-                                }
-                        )
-                        .tag(i)
+//                    Image(uiImage: images[i])
+                    if i == 0 {
+                        VStack {
+                            Text("Original Image")
+                                .foregroundColor(.white)
+                            images[i]
+                                .resizable()
+                                .scaledToFit()
+                                .scaleEffect(scale)
+                                .gesture(
+                                    MagnificationGesture()
+                                        .onChanged { value in
+                                            scale = max(1.0, lastScale * value)
+                                        }
+                                        .onEnded { _ in
+                                            lastScale = scale
+                                        }
+                                )
+                                .tag(i)
+                        }
+                    } else {
+                        VStack {
+                            Text("Disease Detection Image")
+                                .foregroundColor(.white)
+                            images[i]
+                                .resizable()
+                                .scaledToFit()
+                                .tag(i)
+                                .overlay(
+                                    buildMaskImage(mask: mask)
+                                        .opacity(0.7))
+                                .overlay(
+                                    DetectionViewRepresentable(
+                                        predictions: $predictions)
+                                    .opacity(0))
+                        }
+                        
+                    }
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))

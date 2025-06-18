@@ -37,9 +37,7 @@ struct JournalEntry: Identifiable {
 }
 
 struct JournalView: View {
-    
     let pot : Pot?
-
     // Dummy data
     @State private var journalEntries: [JournalEntry] = [
         JournalEntry(

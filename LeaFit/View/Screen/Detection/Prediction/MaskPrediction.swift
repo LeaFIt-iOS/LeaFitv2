@@ -47,23 +47,11 @@ struct MaskPrediction: Identifiable {
 
 let colors: [UIColor] = {
     var colors = [
-        UIColor(hex: "#FF3838FF"),
-        UIColor(hex: "#FF9D97FF"),
-        UIColor(hex: "#FF701FFF"),
-        UIColor(hex: "#FFB21DFF"),
-        UIColor(hex: "#CFD231FF"),
-        UIColor(hex: "#48F90AFF"),
-        UIColor(hex: "#92CC17FF"),
-        UIColor(hex: "#3DDB86FF"),
-        UIColor(hex: "#1A9334FF"),
-        UIColor(hex: "#00D4BBFF"),
-        UIColor(hex: "#2C99A8FF"),
-        UIColor(hex: "#00C2FFFF"),
-        UIColor(hex: "#344593FF"),
-        UIColor(hex: "#6473FFFF"),
-        UIColor(hex: "#0018ECFF"),
+        UIColor(hex: "#FFF40654"),
+        UIColor(hex: "#FF7D28F7"),
+        UIColor(hex: "#FF01FED0"),
+        UIColor(hex: "#FFFF7E00"),
     ]
-    colors.append(contentsOf: (0..<65).map { _ in UIColor.random })
     return colors
 }()
 

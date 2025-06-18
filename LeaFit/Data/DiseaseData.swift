@@ -11,7 +11,7 @@ let diseases: [Disease] = [
     Disease(
         diseaseId: "anthracnose",
         nameDisease: "Anthracnose",
-        explanation: "tolong ditambah yaa kawan kawan penjelasan penyakitnya bagaimana",
+        explanation: "A fungal disease caused by Colletotrichum species. It thrives in warm, humid conditions and spreads quickly when aloe leaves stay wet for long periods.",
         prevention: [
             Prevention(
                 preventionTitle: "Move to Good Air Circulation Area",
@@ -83,7 +83,7 @@ let diseases: [Disease] = [
     Disease(
         diseaseId: "sunburn",
         nameDisease: "Sunburn",
-        explanation: "tolong ditambah yaa kawan kawan penjelasan penyakitnya bagaimana",
+        explanation: "Caused by excessive exposure to direct sunlight, especially when Aloe is moved too quickly from shade to sun. Sunburn isn’t a pathogen but a physical stress injury.",
         prevention: [
             Prevention(
                 preventionTitle: "Move to a Shadier Place",
@@ -157,7 +157,7 @@ let diseases: [Disease] = [
     Disease(
         diseaseId: "rot",
         nameDisease: "Rot",
-        explanation: "tolong ditambah yaa kawan kawan penjelasan penyakitnya bagaimana",
+        explanation: "A disease caused by overwatering or poor drainage, leading to fungal or bacterial infection, particularly from pathogens like Pythium or Fusarium.",
         prevention: [
             Prevention(
                 preventionTitle: "Unplug and Check the Root",
@@ -229,7 +229,7 @@ let diseases: [Disease] = [
     Disease(
         diseaseId: "rust",
         nameDisease: "Rust",
-        explanation: "tolong ditambah yaa kawan kawan penjelasan penyakitnya bagaimana",
+        explanation: "A fungal disease caused by Phakopsora pachyrhizi (though rare in Aloe, rust-like symptoms can appear). It typically occurs in warm, moist conditions.",
         prevention: [
             Prevention(
                 preventionTitle: "Identification of Early Symptoms",

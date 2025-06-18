@@ -82,6 +82,21 @@ class ContentViewModel: ObservableObject {
         setupBindings()
     }
     
+    func saveDiagnoses() -> [Diagnose] {
+        let a : [Diagnose] = highestScores
+            .sorted(by: { $0.value > $1.value }) // if you want sorted
+            .compactMap { (key, value) -> Diagnose? in
+                guard diseases.contains(where: { $0.diseaseId == key }) else { return nil }
+
+                return Diagnose(
+                    confidenceScore: Int(value * 100),
+                    diseaseId: key
+                )
+            }
+
+        return a
+    }
+    
     func addImage(_ image: UIImage) {
         uiImage = image
         Task {

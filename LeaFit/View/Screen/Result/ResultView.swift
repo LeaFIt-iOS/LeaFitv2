@@ -40,7 +40,7 @@ struct ResultView: View {
                 .navigationBarBackButtonHidden(true)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!)) {
+                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!, diagnoses: viewModel.saveDiagnoses())) {
                             Text("Next")
                         }
                     }
@@ -88,25 +88,19 @@ struct ResultView: View {
                         Text("Healthy yey")
                     }
                 }
-                //                .navigationBarBackButtonHidden(true)
-                //                .toolbar {
-                //                    ToolbarItem(placement: .navigationBarTrailing) {
-                //                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!)) {
-                //                            Text("Next")
-                //                        }
-                //                    }
-                //                }
-                //                .accentColor(LeaFitColors.primary)
-                //                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                //                .background(LeaFitColors.background)
-                //                .fullScreenCover(isPresented: $isFullScreen) {
-                //                    ImageCarousel(images: [Image(uiImage: originalImage), Image(UIImage: viewModel.uiImage!)]) {
-                //                        isFullScreen = false
-                //                    }
-                //                }
-            }
+                .navigationBarBackButtonHidden(true)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!, diagnoses: viewModel.saveDiagnoses())) {
+                            Text("Next")
+                        }
+                    }
+                }
+                .accentColor(LeaFitColors.primary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(LeaFitColors.background)
                 
-            
+            }
         }
         
     }

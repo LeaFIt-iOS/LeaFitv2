@@ -205,7 +205,7 @@ struct SickPlantSection: View {
             
             
             
-
+            
         }
     }
 }
@@ -214,45 +214,45 @@ struct SickPlantSection: View {
 //    HealthyPlantSection()
 //}
 
-        @ViewBuilder func buildMaskImage(mask: UIImage?) -> some View {
-            if let mask {
-                Image(uiImage: mask)
-                    .resizable()
-                    .antialiased(false)
-                    .interpolation(.none)
-            }
-        }
-
-
-@ViewBuilder func buildMasksSheet(maskPredictions: [MaskPrediction] ) -> some View {
-    ScrollView {
-        LazyVStack(alignment: .center, spacing: 8) {
-            ForEach(Array(maskPredictions.enumerated()), id: \.offset) { index, maskPrediction in
-                VStack(alignment: .center) {
-                    Group {
-                        if let maskImg = maskPrediction.getMaskImage() {
-                            Image(uiImage: maskImg)
-                                .resizable()
-                                .antialiased(false)
-                                .interpolation(.none)
-                                .aspectRatio(contentMode: .fit)
-                                .background(Color.black)
-                                .contextMenu {
-                                    Button(action: {
-                                        UIImageWriteToSavedPhotosAlbum(maskImg, nil, nil, nil)
-                                    }) {
-                                        Label("Save to camera roll", systemImage: "square.and.arrow.down")
-                                    }
-                                }
-                        } else {
-                            let _ = print("maskImg is nil")
-                        }
-                    }
-                    Divider()
-                }.frame(maxWidth: .infinity, alignment: .center)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .padding()
+@ViewBuilder func buildMaskImage(mask: UIImage?) -> some View {
+    if let mask {
+        Image(uiImage: mask)
+            .resizable()
+            .antialiased(false)
+            .interpolation(.none)
     }
 }
+
+
+//@ViewBuilder func buildMasksSheet(maskPredictions: [MaskPrediction] ) -> some View {
+//    ScrollView {
+//        LazyVStack(alignment: .center, spacing: 8) {
+//            ForEach(Array(maskPredictions.enumerated()), id: \.offset) { index, maskPrediction in
+//                VStack(alignment: .center) {
+//                    Group {
+//                        if let maskImg = maskPrediction.getMaskImage() {
+//                            Image(uiImage: maskImg)
+//                                .resizable()
+//                                .antialiased(false)
+//                                .interpolation(.none)
+//                                .aspectRatio(contentMode: .fit)
+//                                .background(Color.black)
+//                                .contextMenu {
+//                                    Button(action: {
+//                                        UIImageWriteToSavedPhotosAlbum(maskImg, nil, nil, nil)
+//                                    }) {
+//                                        Label("Save to camera roll", systemImage: "square.and.arrow.down")
+//                                    }
+//                                }
+//                        } else {
+//                            let _ = print("maskImg is nil")
+//                        }
+//                    }
+//                    Divider()
+//                }.frame(maxWidth: .infinity, alignment: .center)
+//            }
+//        }
+//        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+//        .padding()
+//    }
+//}

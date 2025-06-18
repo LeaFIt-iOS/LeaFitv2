@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct JournalCard: View {
-    let image: String
+    let image: UIImage
     let disease: String
+    let otherDiseasesTotal: Int
     let date: Date
     let isFirst: Bool
     let isLast: Bool
@@ -44,7 +45,7 @@ struct JournalCard: View {
                 Spacer()
                     .frame(width: 30)
                 
-                Image(image)
+                Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 90, height: 90)
@@ -61,13 +62,21 @@ struct JournalCard: View {
                                 .foregroundColor(LeaFitColors.primary)
                                 .lineLimit(1)
                             
-                            if disease.contains("("),
-                               let othersPart = disease.split(separator: "(").dropFirst().first {
-                                Text("and (\(othersPart)")
+                            //                            if disease.contains("("),
+                            //                               let othersPart = disease.split(separator: "(").dropFirst().first {
+                            //                                Text("and (\(othersPart)")
+                            //                                    .font(.subheadline)
+                            //                                    .foregroundColor(LeaFitColors.primary)
+                            //                                    .lineLimit(1)
+                            //                            }
+                            
+                            if otherDiseasesTotal > 0 {
+                                Text("and \(otherDiseasesTotal) other diseases")
                                     .font(.subheadline)
                                     .foregroundColor(LeaFitColors.primary)
                                     .lineLimit(1)
                             }
+                            
                         }
                         Spacer()
                     }
@@ -153,31 +162,35 @@ extension View {
 #Preview {
     VStack(spacing: 0) {
         JournalCard(
-            image: "aloe_sample",
+            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
             disease: "Anthracnose",
+            otherDiseasesTotal: 3,
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 17, hour: 9, minute: 43))!,
             isFirst: true,
             isLast: false
         )
         
         JournalCard(
-            image: "aloe_sample",
+            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
             disease: "Rot (2 others)",
+            otherDiseasesTotal: 2,
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 16, hour: 14, minute: 20))!,
             isFirst: false,
             isLast: false
         )
         
         JournalCard(
-            image: "aloe_sample",
+            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
             disease: "Very Long Disease Name That Might Cause Layout Issues (3 others)",
+            otherDiseasesTotal: 1,
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 8, minute: 15))!,
             isFirst: false,
             isLast: false
         )
         JournalCard(
-            image: "aloe_sample",
+            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
             disease: "Sunburn Cok",
+            otherDiseasesTotal: 0,
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 8, minute: 15))!,
             isFirst: false,
             isLast: true

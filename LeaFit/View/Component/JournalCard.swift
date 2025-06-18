@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct JournalCard: View {
-    let image: String
+    let image: UIImage
     let disease: String
     let date: Date
     let isFirst: Bool
@@ -44,7 +44,7 @@ struct JournalCard: View {
                 Spacer()
                     .frame(width: 30)
                 
-                Image(image)
+                Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 90, height: 90)
@@ -153,7 +153,7 @@ extension View {
 #Preview {
     VStack(spacing: 0) {
         JournalCard(
-            image: "aloe_sample",
+            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
             disease: "Anthracnose",
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 17, hour: 9, minute: 43))!,
             isFirst: true,
@@ -161,7 +161,7 @@ extension View {
         )
         
         JournalCard(
-            image: "aloe_sample",
+            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
             disease: "Rot (2 others)",
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 16, hour: 14, minute: 20))!,
             isFirst: false,
@@ -169,14 +169,14 @@ extension View {
         )
         
         JournalCard(
-            image: "aloe_sample",
+            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
             disease: "Very Long Disease Name That Might Cause Layout Issues (3 others)",
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 8, minute: 15))!,
             isFirst: false,
             isLast: false
         )
         JournalCard(
-            image: "aloe_sample",
+            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
             disease: "Sunburn Cok",
             date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 8, minute: 15))!,
             isFirst: false,

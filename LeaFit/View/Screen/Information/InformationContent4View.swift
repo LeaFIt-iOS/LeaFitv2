@@ -12,6 +12,7 @@ struct InformationContent4View: View {
     let contents: [ContentItem] = [
         ContentItem(image: "img-information4.1", title2: "Use Bright Lighting", caption: "Take the photo in natural light or a well lit room avoid shadows and glare."),
         ContentItem(image: "img-information4.2", title2: "Show the Leaf Clearly", caption: "Make sure the leaf (especially the diseased part) is fully visible in the frame."),
+        ContentItem(image: "img-information4.4", title2: "Simple Background", caption: "Use a plain or uncluttered background to help detect the leaf more accurately."),
         ContentItem(image: "img-information4.3", title2: "Keep It Sharp", caption: "Hold your device steady avoid blurry photos.")
     ]
     
@@ -21,8 +22,7 @@ struct InformationContent4View: View {
                 HStack(spacing: 20) {
                     Image(item.image)
                         .resizable()
-                        .frame( width: 66, height: 66
-                        )
+                        .frame( width: 66, height: 62)
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text(item.title2)

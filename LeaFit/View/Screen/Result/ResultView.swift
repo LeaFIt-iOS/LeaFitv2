@@ -208,7 +208,7 @@ struct ResultView: View {
                 .navigationBarBackButtonHidden(true)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!)) {
+                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!, diagnoses: viewModel.saveDiagnoses())) {
                             Text("Next")
                         }
                     }
@@ -255,7 +255,7 @@ struct ResultView: View {
                 .navigationBarBackButtonHidden(true)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!)) {
+                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!, diagnoses: viewModel.saveDiagnoses())) {
                             Text("Next")
                         }
                     }
@@ -265,7 +265,6 @@ struct ResultView: View {
                 .background(LeaFitColors.background)
                 
             }
-            
         }
         
     }

@@ -11,20 +11,20 @@ import AVFoundation
 import UIKit
 import SwiftUICore
 
-enum Pots: String, CaseIterable, Identifiable {
-    case Pot1, Pot2, Pot3
-    var id: Self { self }
-}
-
-@Observable
-final class ResultDetailViewModel {
-    var date = Date()
-    var notes: String = ""
-    var pots: [Pots] = Pots.allCases
+final class ResultDetailViewModel: ObservableObject {
+    @Published var date = Date()
+    @Published var notes: String = ""
     
-    var selectedPot: Pots = Pots.Pot1
+    @Published var pots: [Pot] = []
+    @Published var selectedPot: Pot? = nil
     
-    init() {
-        
+    func loadPots(context: ModelContext) {
+        do {
+            let descriptor = FetchDescriptor<Pot>(sortBy: [SortDescriptor(\.namePot)])
+            pots = try context.fetch(descriptor)
+            selectedPot = pots.first // Safely unwrap
+        } catch {
+            print("Failed to fetch pots: \(error)")
+        }
     }
 }

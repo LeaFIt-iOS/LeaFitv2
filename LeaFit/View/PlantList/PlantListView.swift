@@ -91,7 +91,7 @@ struct PlantListView: View {
                     ScrollView{
                         LazyVGrid(columns: cardColumns, spacing: 16) {
                                 ForEach(filteredPots, id: \.id) { pot in
-                                    NavigationLink(destination: DetailPotView(pot: pot)) {
+                                    NavigationLink(destination: JournalView(pot: pot)) {
                                         PotCardView(pots: pot)
                                     }
 //                                    .buttonStyle(PlainButtonStyle())

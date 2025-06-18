@@ -10,8 +10,9 @@ import SwiftData
 
 struct JournalEntry: Identifiable {
     let id = UUID()
-        
-    let image: UIImage
+    
+    let originalImage: UIImage
+    let processedImage: UIImage
     let diseases: [String: Double] // Disease name and confidence percentage
     let date: Date
     
@@ -23,9 +24,9 @@ struct JournalEntry: Identifiable {
     var diseaseDisplayText: String {
         let sortedDiseases = diseases.sorted(by: { $0.value > $1.value })
         guard let primary = sortedDiseases.first else { return "Unknown" }
-
+        
         let othersCount = sortedDiseases.count - 1
-
+        
         //kalo other cuma 1 jadi other, kalo lebih dari 1 jadi others
         if othersCount <= 0 {
             return primary.key
@@ -60,6 +61,10 @@ struct LeafCardView: View {
         }
     }
     
+    private var otherDiseasesCount: Int {
+        leaf.diagnose.count - 1
+    }
+    
     private var isFirst: Bool {
         index == 0
     }
@@ -74,6 +79,7 @@ struct LeafCardView: View {
                 JournalCard(
                     image: image,
                     disease: diseaseDisplay,
+                    otherDiseasesTotal: otherDiseasesCount,
                     date: leaf.dateCreated,
                     isFirst: isFirst,
                     isLast: isLast
@@ -91,12 +97,12 @@ struct JournalView: View {
     @State private var showModality = false
     
     let pot: Pot?
-
+    
     // Computed property for leaves from the optional pot
     private var leaves: [Leaf] {
         pot?.leaves ?? []
     }
-
+    
     // Computed property to sort them by date
     private var sortedLeaves: [Leaf] {
         leaves.sorted(by: { $0.dateCreated > $1.dateCreated })
@@ -109,28 +115,79 @@ struct JournalView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                LazyVStack {
-                    ForEach(enumeratedLeaves, id: \.1.id) { indexAndLeaf in
-                        let index = indexAndLeaf.0
-                        let leaf = indexAndLeaf.1
+            if !leaves.isEmpty {
+                ScrollView {
+                    LazyVStack {
+                        ForEach(enumeratedLeaves, id: \.1.id) { indexAndLeaf in
+                            let index = indexAndLeaf.0
+                            let leaf = indexAndLeaf.1
+                            
+                            LeafCardView(
+                                leaf: leaf,
+                                index: index,
+                                totalCount: sortedLeaves.count,
+                                onTap: handleLeafTap
+                            )
+                        }
+                    }
+                    .padding(.top, 20)
+                }
+                .navigationTitle(pot?.namePot ?? "")
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Spacer()
                         
-                        LeafCardView(
-                            leaf: leaf,
-                            index: index,
-                            totalCount: sortedLeaves.count,
-                            onTap: handleLeafTap
-                        )
+                        Text("\(sortedLeaves.count) pictures")
+                            .font(.footnote)
+                        
+                        Spacer()
+                        
+                        NavigationLink(destination: CameraView()) {
+                            Image(systemName: "camera")
+                                .foregroundStyle(Color(hex: "428D6D"))
+                        }
                     }
                 }
-                .padding(.top, 20)
+                .background(LeaFitColors.background.ignoresSafeArea())
+            } else {
+                VStack {
+                    Spacer()
+                    Image("EmptyCategoryLogo2")
+                    Text("\(pot?.namePot ?? "Unknown Pot") is empty")
+                        .font(.title2)
+                        .bold()
+                        .foregroundColor(.gray)
+                    Text("Start taking your pictures here!")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    NavigationLink (destination: CameraView()){
+                        HStack {
+                            Image(systemName: "camera.fill")
+                                .foregroundColor(Color(hex: "428D6D"))
+                                .font(.system(size: 18, weight: .semibold, design: .default))
+                            Text("Take Picture")
+                                .foregroundColor(Color(hex: "428D6D"))
+                                .font(.system(size: 17, weight: .semibold, design: .default))
+                        }
+                        .padding(.top, 12)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(LeaFitColors.background)
+                .ignoresSafeArea()
+                
             }
-            .navigationTitle(pot?.namePot ?? "")
-            .navigationBarTitleDisplayMode(.large)
-            .background(LeaFitColors.background)
-            .onAppear {
-                printSelectedPot()
-            }
+            
+        }
+        
+        .scrollContentBackground(.hidden)
+        .onAppear {
+            printSelectedPot()
         }
         .sheet(isPresented: $showModality) {
             if let entry = selectedEntry {
@@ -141,13 +198,15 @@ struct JournalView: View {
     
     // Extracted helper method
     private func handleLeafTap(_ leaf: Leaf) {
-        guard let image = UIImage(data: leaf.processedImage) else { return }
+        guard let originalImage = UIImage(data: leaf.originalImage) else { return }
+        guard let processedImage = UIImage(data: leaf.processedImage) else { return }
         
         let topDisease = getTopDisease(from: leaf.diagnose)
         let diseases = createDiseaseDictionary(from: topDisease)
         
         selectedEntry = JournalEntry(
-            image: image,
+            originalImage: originalImage,
+            processedImage: processedImage,
             diseases: diseases,
             date: leaf.dateCreated
         )
@@ -168,7 +227,7 @@ struct JournalView: View {
     }
     
     func printSelectedPot() {
-        print("This is from 🪴: \(pot?.namePot ?? "No pot passed")")
+        print("This is from 🪴: \(pot?.namePot ?? "No pot passed")　\n")
         
         for leaf in pot?.leaves ?? [] {
             print("""
@@ -181,6 +240,7 @@ struct JournalView: View {
                         📊 Diagnoses:
                         \(leaf.diagnose.map { "- DiseaseID: \($0.diseaseId), Confidence: \($0.confidenceScore)" }.joined(separator: "\n"))
                         """)
+            print("\n")
         }
     }
 }

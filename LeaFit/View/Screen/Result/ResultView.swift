@@ -85,7 +85,7 @@ struct ResultView: View {
                                     //                                        }
                                 }
                             )
-                        Text("Healthy yey")
+                        Text("Healthy")
                     }
                 }
                 .navigationBarBackButtonHidden(true)

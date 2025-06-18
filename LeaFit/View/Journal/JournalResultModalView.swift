@@ -31,7 +31,7 @@ struct JournalResultModalView: View {
                                     .opacity(0.2)
                                     .frame(width: 175, height: 175)
                                     .overlay(
-                                        Image(uiImage: entry.image)
+                                        Image(uiImage: entry.originalImage)
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 175, height: 175)
@@ -46,7 +46,7 @@ struct JournalResultModalView: View {
                                     .opacity(0.2)
                                     .frame(width: 175, height: 175)
                                     .overlay(
-                                        Image(uiImage: entry.image)
+                                        Image(uiImage: entry.processedImage)
                                             .resizable()
                                             .scaledToFit()
                                             .aspectRatio(contentMode: .fit)

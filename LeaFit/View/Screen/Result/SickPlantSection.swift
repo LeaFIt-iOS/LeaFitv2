@@ -95,7 +95,7 @@ struct SickPlantSection: View {
                     .padding(.top, 4)
                 },
                 label: {
-                    Text("Diagnosa")
+                    Text("Diagnose")
                         .font(.system(size: 24, weight: .semibold, design: .default))
                 }
             )

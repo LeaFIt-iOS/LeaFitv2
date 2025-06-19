@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CameraRulesView: View {
+    var namePot: String = ""
+    
     var body: some View {
         VStack(spacing: 34) {
             Text("Get the Best Detection Result")
@@ -25,7 +27,7 @@ struct CameraRulesView: View {
             Spacer()
             
             HStack(spacing: 8) {
-                NavigationLink(destination: CameraView()) {
+                NavigationLink(destination: CameraView(namePot: namePot)) {
                     Text("Start")
                         .font(.system(size: 17, weight: .semibold, design: .default))
                         .foregroundStyle(LeaFitColors.primary)

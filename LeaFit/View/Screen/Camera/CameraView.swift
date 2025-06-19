@@ -13,6 +13,8 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 
 struct CameraView: View {
+    var namePot: String
+    
     @State private var capturedImage: UIImage? = nil
     @State private var showCaptureAlert: Bool = false
     @StateObject private var viewModel = CameraViewModel()
@@ -22,6 +24,7 @@ struct CameraView: View {
         ZStack {
             if let image = capturedImage {
                 CameraResultView(
+                    namePot: namePot,
                     image: image,
                     originalImage: viewModel.originalImage!,
                     onRetake: {

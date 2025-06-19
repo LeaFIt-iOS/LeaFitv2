@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ResultView: View {
+    var namePot: String
     var image: UIImage
     var originalImage: UIImage
     
@@ -36,18 +37,19 @@ struct ResultView: View {
                                   predictions: $viewModel.predictions) {
                         isFullScreen = false
                     }
-                }
-                .navigationBarBackButtonHidden(true)
-                .toolbar {
+                }.toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!, diagnoses: viewModel.saveDiagnoses())) {
+                        NavigationLink(destination: ResultDetailView(namePot: namePot, originalImage: originalImage, resultImage: viewModel.uiImage!, diagnoses: viewModel.saveDiagnoses(), maskImage: viewModel.combinedMaskImage ?? UIImage())) {
                             Text("Next")
                         }
                     }
                 }
+                .navigationBarBackButtonHidden(true)
+                
                 .accentColor(LeaFitColors.primary)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(LeaFitColors.background)
+                
             } else {
                 ScrollView(showsIndicators: false) {
                     VStack {
@@ -91,7 +93,7 @@ struct ResultView: View {
                 .navigationBarBackButtonHidden(true)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: ResultDetailView(originalImage: originalImage, resultImage: viewModel.uiImage!, diagnoses: viewModel.saveDiagnoses())) {
+                        NavigationLink(destination: ResultDetailView(namePot: namePot, originalImage: originalImage, resultImage: viewModel.uiImage!, diagnoses: viewModel.saveDiagnoses(), maskImage: viewModel.combinedMaskImage ?? UIImage())) {
                             Text("Next")
                         }
                     }
@@ -102,6 +104,7 @@ struct ResultView: View {
                 
             }
         }
+            
         
     }
     

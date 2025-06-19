@@ -20,6 +20,10 @@ struct JournalResultModalView: View {
         UIImage(data: entry.originalImage)
     }
     
+    private var maskImage: UIImage? {
+        UIImage(data: entry.maskImage)
+    }
+    
     private var processedImage: UIImage? {
         UIImage(data: entry.processedImage)
     }
@@ -47,6 +51,7 @@ struct JournalResultModalView: View {
                     ImageSectionView(
                         originalImage: originalImage,
                         processedImage: processedImage,
+                        maskImage: maskImage,
                         onImageTap: { isFullScreen = true }
                     )
                     
@@ -93,6 +98,7 @@ struct JournalResultModalView: View {
 struct ImageSectionView: View {
     let originalImage: UIImage?
     let processedImage: UIImage?
+    let maskImage: UIImage?
     let onImageTap: () -> Void
     
     var body: some View {
@@ -102,7 +108,7 @@ struct ImageSectionView: View {
             .overlay(
                 HStack(spacing: 16) {
                     OriginalImageView(image: originalImage, onTap: onImageTap)
-                    ProcessedImageView(image: processedImage, onTap: onImageTap)
+                    ProcessedImageView(image: processedImage, maskImage: maskImage, onTap: onImageTap)
                 }
             )
     }
@@ -137,6 +143,7 @@ struct OriginalImageView: View {
 // MARK: - Processed Image Component
 struct ProcessedImageView: View {
     let image: UIImage?
+    let maskImage: UIImage?
     let onTap: () -> Void
     
     var body: some View {
@@ -151,7 +158,16 @@ struct ProcessedImageView: View {
                             .resizable()
                             .scaledToFit()
                             .aspectRatio(contentMode: .fit)
+                            .overlay(
+                                Image(uiImage: maskImage ?? UIImage())
+                                    .resizable()
+                                
+                                .antialiased(false)
+                                .interpolation(.none)
+                                .opacity(0.7)
+                            )
                     }
+                        
                 }
             )
             .onTapGesture {

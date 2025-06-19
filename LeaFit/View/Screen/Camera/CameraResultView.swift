@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CameraResultView: View {
+    var namePot: String?
     var image: UIImage
     var originalImage: UIImage
     var onRetake: @MainActor () -> Void
@@ -28,7 +29,7 @@ struct CameraResultView: View {
                 
 //                    Button("Next") {
                         
-                        NavigationLink(destination: ResultView(image: image, originalImage: originalImage, viewModel: detectionViewModel)) {
+                NavigationLink(destination: ResultView(namePot: namePot ?? "", image: image, originalImage: originalImage, viewModel: detectionViewModel)) {
                             Text("Next")
                         }
 //                        .onSubmit  {

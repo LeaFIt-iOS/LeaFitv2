@@ -9,6 +9,7 @@ import SwiftUI
 
 struct JournalCard: View {
     let image: UIImage
+    let maskImage: UIImage?
     let disease: String
     let otherDiseasesTotal: Int
     let date: Date
@@ -52,6 +53,13 @@ struct JournalCard: View {
                     .clipped()
                     .cornerRadius(16)
                     .padding(.horizontal)
+                    .overlay(
+                        Image(uiImage: maskImage ?? UIImage())
+                            .resizable()
+                            .antialiased(false)
+                            .interpolation(.none)
+                            .opacity(0.7)
+                    )
                 
                 VStack(alignment: .leading, spacing: 4) {
                     
@@ -159,42 +167,42 @@ extension View {
 }
 
 // Preview
-#Preview {
-    VStack(spacing: 0) {
-        JournalCard(
-            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
-            disease: "Anthracnose",
-            otherDiseasesTotal: 3,
-            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 17, hour: 9, minute: 43))!,
-            isFirst: true,
-            isLast: false
-        )
-        
-        JournalCard(
-            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
-            disease: "Rot (2 others)",
-            otherDiseasesTotal: 2,
-            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 16, hour: 14, minute: 20))!,
-            isFirst: false,
-            isLast: false
-        )
-        
-        JournalCard(
-            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
-            disease: "Very Long Disease Name That Might Cause Layout Issues (3 others)",
-            otherDiseasesTotal: 1,
-            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 8, minute: 15))!,
-            isFirst: false,
-            isLast: false
-        )
-        JournalCard(
-            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
-            disease: "Sunburn Cok",
-            otherDiseasesTotal: 0,
-            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 8, minute: 15))!,
-            isFirst: false,
-            isLast: true
-        )
-    }
-    .background(LeaFitColors.background)
-}
+//#Preview {
+//    VStack(spacing: 0) {
+//        JournalCard(
+//            image: UIImage(systemName: "aloe_sample") ?? UIImage(), maskImage: <#UIImage?#>,
+//            disease: "Anthracnose",
+//            otherDiseasesTotal: 3,
+//            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 17, hour: 9, minute: 43))!,
+//            isFirst: true,
+//            isLast: false
+//        )
+//        
+//        JournalCard(
+//            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
+//            disease: "Rot (2 others)",
+//            otherDiseasesTotal: 2,
+//            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 16, hour: 14, minute: 20))!,
+//            isFirst: false,
+//            isLast: false
+//        )
+//        
+//        JournalCard(
+//            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
+//            disease: "Very Long Disease Name That Might Cause Layout Issues (3 others)",
+//            otherDiseasesTotal: 1,
+//            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 8, minute: 15))!,
+//            isFirst: false,
+//            isLast: false
+//        )
+//        JournalCard(
+//            image: UIImage(systemName: "aloe_sample") ?? UIImage(),
+//            disease: "Sunburn Cok",
+//            otherDiseasesTotal: 0,
+//            date: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 8, minute: 15))!,
+//            isFirst: false,
+//            isLast: true
+//        )
+//    }
+//    .background(LeaFitColors.background)
+//}

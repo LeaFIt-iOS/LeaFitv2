@@ -18,11 +18,15 @@ final class ResultDetailViewModel: ObservableObject {
     @Published var pots: [Pot] = []
     @Published var selectedPot: Pot? = nil
     
-    func loadPots(context: ModelContext) {
+    func loadPots(namePot: String, context: ModelContext) {
         do {
             let descriptor = FetchDescriptor<Pot>(sortBy: [SortDescriptor(\.namePot)])
             pots = try context.fetch(descriptor)
-            selectedPot = pots.first // Safely unwrap
+            if namePot != "" {
+                selectedPot = pots.first { $0.namePot == namePot }
+            } else {
+                selectedPot = pots.first // Safely unwrap
+            }
         } catch {
             print("Failed to fetch pots: \(error)")
         }

@@ -7,8 +7,11 @@
 
 import SwiftUI
 
+
 struct JournalResultModalView: View {
+    
     let entry: Leaf
+    
     @Environment(\.dismiss) private var dismiss
     @State private var isFullScreen = false
     @State private var showDiagnose = true
@@ -40,16 +43,19 @@ struct JournalResultModalView: View {
         entry.diagnose.contains { $0.diseaseId == "Healthy" }
     }
     
+    
     var body: some View {
         NavigationView {
             ScrollView(showsIndicators: false) {
                 VStack {
                     ImageSectionView(
+                        potsName: entry.pot?.namePot ?? "Tes",
+                        leafDate: entry.dateCreated, leafNotes: entry.leafNote,
                         originalImage: originalImage,
                         processedImage: processedImage,
                         onImageTap: { isFullScreen = true }
                     )
-                    
+                    //
                     DiagnosisSectionView(
                         diagnoses: sortedDiagnoses,
                         isExpanded: $showDiagnose
@@ -69,7 +75,7 @@ struct JournalResultModalView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Diagnosis Details")
+            //            .navigationTitle("Diagnosis Details")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -78,11 +84,11 @@ struct JournalResultModalView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Text(entry.dateCreated, style: .date)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                //                ToolbarItem(placement: .navigationBarTrailing) {
+                //                    Text(entry.dateCreated, style: .date)
+                //                        .font(.caption)
+                //                        .foregroundColor(.secondary)
+                //                }
             }
             .background(LeaFitColors.background)
         }
@@ -91,20 +97,74 @@ struct JournalResultModalView: View {
 
 // MARK: - Image Section Component
 struct ImageSectionView: View {
+    
+    let potsName: String
+    let leafDate: Date
+    let leafNotes: String?
     let originalImage: UIImage?
     let processedImage: UIImage?
     let onImageTap: () -> Void
     
+    var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy h:mm a"
+        return formatter.string(from: leafDate)
+    }
+    
     var body: some View {
-        RoundedRectangle(cornerRadius: 15)
-            .fill(LeaFitColors.light)
-            .frame(height: 224)
-            .overlay(
-                HStack(spacing: 16) {
-                    OriginalImageView(image: originalImage, onTap: onImageTap)
-                    ProcessedImageView(image: processedImage, onTap: onImageTap)
-                }
-            )
+        VStack {
+            RoundedRectangle(cornerRadius: 15)
+                .fill(LeaFitColors.light)
+                .frame(height: 344)
+                .overlay(
+                    
+                    VStack (alignment: .leading){
+                        HStack(spacing: 5) {
+                            OriginalImageView(image: originalImage, onTap: onImageTap)
+                            ProcessedImageView(image: processedImage, onTap: onImageTap)
+                        }
+                        VStack(alignment: .leading){
+                            HStack(spacing: 0) {
+                                VStack(alignment: .leading, spacing: 10){
+                                    Text("Pot")
+                                        .foregroundColor(Color(hex:"468D6D"))
+                                        .bold()
+                                        .frame(height: 32)
+                                    Divider()
+                                    Text("Notes")
+                                        .foregroundColor(Color(hex:"468D6D"))
+                                        .bold()
+                                        .frame(height: 32)
+
+                                }
+                                
+                                .padding(.leading)
+                                .padding(.top, 10)
+                                .frame(width: 100)
+                                
+                                VStack(alignment: .leading, spacing: 10){
+                                    Text(potsName)
+                                        .frame(height: 32)
+                                    Divider()
+                                    Text(leafNotes ?? "Notes")
+                                        .frame(height: 32)
+                                }
+                                .padding(.top, 10)
+//                                .frame(height: 72)
+                            }
+//                            padding(.leading)
+                            Divider()
+                                .padding(.leading)
+                            
+                            Text(formattedDate)
+                                .padding()
+                        }
+//                        .padding(.top, 30)
+                    }
+                        .padding()
+                )
+        }
+        
     }
 }
 
@@ -293,12 +353,14 @@ struct DiseaseExplanationItemView: View {
         Group {
             if let disease = matchedDisease {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("[\(disease.nameDisease)]")
-                        .font(.system(size: 14, weight: .bold, design: .default))
-                        .padding(.top)
+
+                        Text("\(disease.nameDisease)")
+                            .font(.system(size: 18, weight: .bold, design: .default))
+                            .padding(.top)
+                        
+                        Text(disease.explanation)
+                            .font(.system(size: 14, weight: .regular, design: .default))
                     
-                    Text(disease.explanation)
-                        .font(.system(size: 14, weight: .regular, design: .default))
                 }
                 .padding(.horizontal)
             }
@@ -341,7 +403,25 @@ struct TreatmentSectionView: View {
 
 // MARK: - Treatment Item Component
 struct TreatmentItemView: View {
+    
     let diseaseId: String
+    
+    
+    private var displayColor: Color {
+        let disease = diseaseId.lowercased()
+        switch true {
+        case disease.contains("anthracnose"):
+            return LeaFitColors.anthracnose
+        case disease.contains("rot"):
+            return LeaFitColors.rot
+        case disease.contains("rust"):
+            return LeaFitColors.rust
+        case disease.contains("sunburn"):
+            return LeaFitColors.sunburn
+        default:
+            return Color.green
+        }
+    }
     
     private var matchedDisease: Disease? {
         diseases.first(where: { $0.diseaseId == diseaseId })
@@ -351,10 +431,18 @@ struct TreatmentItemView: View {
         Group {
             if let disease = matchedDisease {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("[\(disease.nameDisease)]")
-                        .font(.system(size: 14, weight: .bold, design: .default))
-                        .padding(.top)
-                    
+                    HStack {
+                        Circle()
+                            .frame(width: 30, height: 25)
+                            .foregroundColor(displayColor)
+                        
+                        Text("\(disease.nameDisease)")
+                            .font(.system(size: 20, weight: .bold, design: .default))
+                        
+                    }
+                    .padding(.top)
+
+                  
                     PreventionSectionView(preventions: disease.prevention)
                     WateringSectionView(waterings: disease.watering)
                     DryingSectionView(dryings: disease.drying)
@@ -374,15 +462,15 @@ struct PreventionSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Prevention : ")
-                .font(.system(size: 14, weight: .semibold, design: .default))
+                .font(.system(size: 18, weight: .semibold, design: .default))
             
             ForEach(preventions, id: \.preventionTitle) { prevention in
                 VStack(alignment: .leading, spacing: 4) {
                     Text(prevention.preventionTitle)
-                        .font(.system(size: 12, weight: .semibold, design: .default))
+                        .font(.system(size: 16, weight: .semibold, design: .default))
                     
                     Text(prevention.preventionDetail)
-                        .font(.system(size: 10, weight: .regular, design: .default))
+                        .font(.system(size: 14, weight: .regular, design: .default))
                 }
             }
         }
@@ -396,7 +484,7 @@ struct WateringSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Watering : ")
-                .font(.system(size: 14, weight: .semibold, design: .default))
+                .font(.system(size: 20, weight: .semibold, design: .default))
             
             ForEach(waterings, id: \.wateringTips) { watering in
                 VStack(alignment: .leading, spacing: 4) {
@@ -405,7 +493,7 @@ struct WateringSectionView: View {
                     }
                     
                     Text(watering.wateringTips)
-                        .font(.system(size: 10, weight: .semibold, design: .default))
+                        .font(.system(size: 14, weight: .regular, design: .default))
                 }
             }
         }
@@ -422,7 +510,7 @@ struct WateringConditionView: View {
     
     var body: some View {
         Text(conditionText)
-            .font(.system(size: 12, weight: .semibold, design: .default))
+            .font(.system(size: 14, weight: .regular, design: .default))
     }
 }
 
@@ -433,7 +521,7 @@ struct DryingSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Drying : ")
-                .font(.system(size: 14, weight: .semibold, design: .default))
+                .font(.system(size: 20, weight: .semibold, design: .default))
             
             ForEach(dryings, id: \.dryingTips) { drying in
                 VStack(alignment: .leading, spacing: 4) {
@@ -442,7 +530,7 @@ struct DryingSectionView: View {
                     }
                     
                     Text(drying.dryingTips)
-                        .font(.system(size: 10, weight: .semibold, design: .default))
+                        .font(.system(size: 14, weight: .regular, design: .default))
                 }
             }
         }
@@ -459,7 +547,7 @@ struct DryingConditionView: View {
     
     var body: some View {
         Text(conditionText)
-            .font(.system(size: 12, weight: .semibold, design: .default))
+            .font(.system(size: 14, weight: .regular, design: .default))
     }
 }
 

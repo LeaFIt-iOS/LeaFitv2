@@ -137,9 +137,9 @@ struct JournalView: View {
                     ToolbarItemGroup(placement: .bottomBar) {
                         Spacer()
                         
-                        Text("\(sortedLeaves.count) pictures")
+                        Text("\(sortedLeaves.count) Pictures")
                             .font(.footnote)
-                        
+                            .foregroundColor(Color(hex:"428D6D"))
                         Spacer()
                         
                         NavigationLink(destination: CameraView()) {
@@ -161,7 +161,7 @@ struct JournalView: View {
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     NavigationLink (destination: CameraView()){
-                        HStack {
+                        HStack (spacing: 2){
                             Image(systemName: "camera.fill")
                                 .foregroundColor(Color(hex: "428D6D"))
                                 .font(.system(size: 18, weight: .semibold, design: .default))

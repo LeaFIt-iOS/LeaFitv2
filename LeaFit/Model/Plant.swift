@@ -47,15 +47,17 @@ class Leaf {
     @Attribute var id: UUID
     @Attribute var originalImage: Data
     @Attribute var processedImage: Data
+    @Attribute var maskImage: Data
     @Attribute var leafNote: String? = ""
     @Attribute var dateCreated: Date
     @Relationship var diagnose: [Diagnose]
     @Relationship(inverse: \Pot.leaves) var pot: Pot?
     
-    init(id: UUID = UUID(), originalImage: Data, processedImage: Data, leafNote: String, dateCreated: Date, diagnose: [Diagnose], pot: Pot? = nil) {
+    init(id: UUID = UUID(), originalImage: Data, processedImage: Data, maskImage: Data, leafNote: String, dateCreated: Date, diagnose: [Diagnose], pot: Pot? = nil) {
         self.id = id
         self.originalImage = originalImage
         self.processedImage = processedImage
+        self.maskImage = maskImage
         self.leafNote = leafNote
         self.dateCreated = dateCreated
         self.diagnose = diagnose

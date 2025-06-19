@@ -9,14 +9,18 @@ import SwiftUI
 import SwiftData
 
 struct ResultDetailView: View {
+    private var namePot: String
     private var originalImage: UIImage
     private var resultImage: UIImage
     private var diagnoses: [Diagnose]
+    private var maskImage: UIImage? = nil
     
-    init(originalImage: UIImage, resultImage: UIImage, diagnoses: [Diagnose]) {
+    init(namePot: String, originalImage: UIImage, resultImage: UIImage, diagnoses: [Diagnose], maskImage: UIImage) {
+        self.namePot = namePot
         self.originalImage = originalImage
         self.resultImage = resultImage
         self.diagnoses = diagnoses
+        self.maskImage = maskImage
     }
     
     @StateObject private var viewModel: ResultDetailViewModel = ResultDetailViewModel()
@@ -42,7 +46,18 @@ struct ResultDetailView: View {
                             .opacity(0.2)
                             .frame(height: 393)
                             .overlay(
-                                Image(uiImage: resultImage).resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: 393)
+                                Group{
+                                    Image(uiImage: resultImage).resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: 393)
+                                        .overlay{
+                                            Image(uiImage: maskImage ?? UIImage())
+                                                .resizable()
+                                                .antialiased(false)
+                                                .interpolation(.none)
+                                                .opacity(0.7)
+                                                .scaledToFit()
+                                                .frame(maxWidth: .infinity, maxHeight: 393)
+                                        }
+                                }
                             )
                     }
                     .frame(height: 393)
@@ -50,17 +65,9 @@ struct ResultDetailView: View {
                     
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color.white)
-                        .frame(height: 170)
+                        .frame(height: 120)
                         .overlay(
                             VStack(alignment: .leading) {
-                                DatePicker(
-                                    "Time",
-                                    selection: $viewModel.date,
-                                    displayedComponents: [.date]
-                                )
-//                                
-                                Divider()
-                                
                                 List {
                                     Picker(selection: $viewModel.selectedPot) {
                                         ForEach(viewModel.pots, id: \.self) { pot in
@@ -70,6 +77,7 @@ struct ResultDetailView: View {
                                         Text("Pot")
                                     }
                                     .listRowInsets(EdgeInsets())
+                                    .disabled(namePot != "" ? true : false)
                                 }
                                 .listStyle(PlainListStyle())
                                 
@@ -101,7 +109,7 @@ struct ResultDetailView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(LeaFitColors.background)
             .onAppear {
-                viewModel.loadPots(context: context)
+                viewModel.loadPots(namePot: namePot, context: context)
             }
             
             .navigationDestination(isPresented: $navigateToSuccess){
@@ -122,8 +130,9 @@ struct ResultDetailView: View {
         let newLeaf = Leaf(
             originalImage: originalImageData,
             processedImage: resultImageData,
+            maskImage: maskImage!.pngData()!,
             leafNote: viewModel.notes,
-            dateCreated: viewModel.date,
+            dateCreated: Date(),
             diagnose: [], // fill this below
             pot: viewModel.selectedPot
         )

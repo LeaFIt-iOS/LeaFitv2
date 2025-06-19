@@ -61,7 +61,7 @@ struct MainMenuView: View {
                                         .foregroundStyle(Color(hex: "428D6D"))
                                 }
                                 Spacer()
-                                NavigationLink(destination: CameraRulesView()) {
+                                NavigationLink(destination: CameraRulesView(namePot: "")) {
                                     Image(systemName: "camera")
                                         .foregroundStyle(Color(hex: "428D6D"))
                                 }

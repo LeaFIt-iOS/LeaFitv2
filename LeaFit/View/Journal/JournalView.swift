@@ -78,6 +78,7 @@ struct LeafCardView: View {
             if let image = image {
                 JournalCard(
                     image: image,
+                    maskImage: UIImage(data: leaf.maskImage),
                     disease: diseaseDisplay,
                     otherDiseasesTotal: otherDiseasesCount,
                     date: leaf.dateCreated,
@@ -142,7 +143,7 @@ struct JournalView: View {
                             .foregroundColor(Color(hex:"428D6D"))
                         Spacer()
                         
-                        NavigationLink(destination: CameraView()) {
+                        NavigationLink(destination: CameraRulesView(namePot: pot?.namePot ?? "")) {
                             Image(systemName: "camera")
                                 .foregroundStyle(Color(hex: "428D6D"))
                         }

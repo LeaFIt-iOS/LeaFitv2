@@ -23,6 +23,10 @@ struct JournalResultModalView: View {
         UIImage(data: entry.originalImage)
     }
     
+    private var maskImage: UIImage? {
+        UIImage(data: entry.maskImage)
+    }
+    
     private var processedImage: UIImage? {
         UIImage(data: entry.processedImage)
     }
@@ -53,6 +57,7 @@ struct JournalResultModalView: View {
                         leafDate: entry.dateCreated, leafNotes: entry.leafNote,
                         originalImage: originalImage,
                         processedImage: processedImage,
+                        maskImage: maskImage,
                         onImageTap: { isFullScreen = true }
                     )
                     //
@@ -103,6 +108,7 @@ struct ImageSectionView: View {
     let leafNotes: String?
     let originalImage: UIImage?
     let processedImage: UIImage?
+    let maskImage: UIImage?
     let onImageTap: () -> Void
     
     var formattedDate: String {
@@ -164,7 +170,6 @@ struct ImageSectionView: View {
                         .padding()
                 )
         }
-        
     }
 }
 
@@ -197,6 +202,7 @@ struct OriginalImageView: View {
 // MARK: - Processed Image Component
 struct ProcessedImageView: View {
     let image: UIImage?
+    let maskImage: UIImage?
     let onTap: () -> Void
     
     var body: some View {
@@ -211,7 +217,16 @@ struct ProcessedImageView: View {
                             .resizable()
                             .scaledToFit()
                             .aspectRatio(contentMode: .fit)
+                            .overlay(
+                                Image(uiImage: maskImage ?? UIImage())
+                                    .resizable()
+                                
+                                .antialiased(false)
+                                .interpolation(.none)
+                                .opacity(0.7)
+                            )
                     }
+                        
                 }
             )
             .onTapGesture {

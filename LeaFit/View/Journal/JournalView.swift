@@ -138,9 +138,9 @@ struct JournalView: View {
                     ToolbarItemGroup(placement: .bottomBar) {
                         Spacer()
                         
-                        Text("\(sortedLeaves.count) pictures")
+                        Text("\(sortedLeaves.count) Pictures")
                             .font(.footnote)
-                        
+                            .foregroundColor(Color(hex:"428D6D"))
                         Spacer()
                         
                         NavigationLink(destination: CameraRulesView(namePot: pot?.namePot ?? "")) {
@@ -161,8 +161,8 @@ struct JournalView: View {
                     Text("Start taking your pictures here!")
                         .font(.subheadline)
                         .foregroundColor(.gray)
-                    NavigationLink (destination: CameraRulesView(namePot: pot?.namePot ?? "")){
-                        HStack {
+                    NavigationLink (destination: CameraView()){
+                        HStack (spacing: 2){
                             Image(systemName: "camera.fill")
                                 .foregroundColor(Color(hex: "428D6D"))
                                 .font(.system(size: 18, weight: .semibold, design: .default))

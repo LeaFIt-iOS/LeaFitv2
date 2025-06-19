@@ -128,7 +128,7 @@ struct SickPlantSection: View {
                         ForEach(Array(viewModel.highestScores.sorted(by: { $0.value > $1.value })), id: \.key) { score in
                             if let matchedItem = diseases.first(where: { $0.diseaseId == score.key }) {
                                 VStack(alignment: .leading, spacing: 12) {
-                                    Text("[\(matchedItem.nameDisease)]")
+                                    Text("\(matchedItem.nameDisease)")
                                         .font(.system(size: 14, weight: .bold, design: .default))
                                         .padding(.top)
                                     
@@ -159,46 +159,52 @@ struct SickPlantSection: View {
                         ForEach(Array(viewModel.highestScores.sorted(by: { $0.value > $1.value })), id: \.key) { score in
                             if let matchedItem = diseases.first(where: { $0.diseaseId == score.key }) {
                                 VStack(alignment: .leading, spacing: 12) {
-                                    Text("[\(matchedItem.nameDisease)]")
-                                        .font(.system(size: 14, weight: .bold, design: .default))
-                                        .padding(.top)
-                                    
+                                    HStack{
+                                        Circle()
+                                            .frame(width: 30, height: 30)
+                                            .foregroundColor(displayColor(matchedItem.nameDisease))
+                                        
+                                        Text("\(matchedItem.nameDisease)")
+                                            .font(.system(size: 20, weight: .bold, design: .default))
+                                    }
+                                    .padding(.top)
+
                                     Text("Prevention : ")
-                                        .font(.system(size: 14, weight: .semibold, design: .default))
+                                        .font(.system(size: 18, weight: .semibold, design: .default))
                                     
                                     ForEach(matchedItem.prevention, id: \.preventionTitle) { prevention in
                                         Text(prevention.preventionTitle)
-                                            .font(.system(size: 12, weight: .semibold, design: .default))
+                                            .font(.system(size: 16, weight: .semibold, design: .default))
                                         
                                         Text(prevention.preventionDetail)
-                                            .font(.system(size: 10, weight: .regular, design: .default))
+                                            .font(.system(size: 14, weight: .regular, design: .default))
                                     }
                                     
                                     Text("Watering : ")
-                                        .font(.system(size: 14, weight: .semibold, design: .default))
+                                        .font(.system(size: 18, weight: .semibold, design: .default))
                                     
                                     ForEach(matchedItem.watering, id: \.wateringTips) { watering in
                                         ForEach(watering.wateringCondition, id: \.condition) { wateringCondition in
                                             Text("\(wateringCondition.condition) - \(wateringCondition.wateringFrequency) (Frequency) - \(wateringCondition.wateringVolume) (Volume) - \(wateringCondition.wateringNote) (Note)")
-                                                .font(.system(size: 12, weight: .semibold, design: .default))
+                                                .font(.system(size: 16, weight: .regular, design: .default))
                                         }
                                         
                                         Text(watering.wateringTips)
-                                            .font(.system(size: 10, weight: .semibold, design: .default))
+                                            .font(.system(size: 14, weight: .semibold, design: .default))
                                     }
                                     
                                     
                                     Text("Drying : ")
-                                        .font(.system(size: 14, weight: .semibold, design: .default))
+                                        .font(.system(size: 18, weight: .semibold, design: .default))
                                     
                                     ForEach(matchedItem.drying, id: \.dryingTips) { drying in
                                         ForEach(drying.dryingCondition, id: \.plantCondition) { dryingCondition in
                                             Text("\(dryingCondition.plantCondition) - \(dryingCondition.dryingDuration) (Duration) - \(dryingCondition.dryingBestTime) (Best Time) - \(dryingCondition.dryingNote) (Note)")
-                                                .font(.system(size: 12, weight: .semibold, design: .default))
+                                                .font(.system(size: 16, weight: .regular, design: .default))
                                         }
                                         
                                         Text(drying.dryingTips)
-                                            .font(.system(size: 10, weight: .semibold, design: .default))
+                                            .font(.system(size: 14, weight: .semibold, design: .default))
                                     }
                                     
                                     Divider()

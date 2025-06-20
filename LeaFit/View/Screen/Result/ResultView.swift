@@ -63,9 +63,6 @@ struct ResultView: View {
                                         .opacity(0.2)
                                         .frame(width: 175, height: 175)
                                         .overlay(Image(uiImage: originalImage).resizable().scaledToFit().frame(width: 175, height: 175))
-                                    //                                        .onTapGesture {
-                                    //                                            isFullScreen = true
-                                    //                                        }
                                     RoundedRectangle(cornerRadius: 15)
                                         .fill(Color.gray)
                                         .opacity(0.2)
@@ -82,9 +79,6 @@ struct ResultView: View {
                                                 }
                                             }
                                         )
-                                    //                                        .onTapGesture {
-                                    //                                            isFullScreen = true
-                                    //                                        }
                                 }
                             )
                         Text("Healthy")
@@ -104,7 +98,7 @@ struct ResultView: View {
                 
             }
         }
-            
+        
         
     }
     

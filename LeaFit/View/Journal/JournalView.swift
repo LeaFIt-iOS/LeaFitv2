@@ -116,7 +116,7 @@ struct JournalView: View {
     var body: some View {
         NavigationView {
             if !leaves.isEmpty {
-                ScrollView {
+                ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack {
                         ForEach(enumeratedLeaves, id: \.1.id) { indexAndLeaf in
                             let index = indexAndLeaf.0
@@ -134,21 +134,7 @@ struct JournalView: View {
                 }
                 .navigationTitle(pot?.namePot ?? "")
                 .navigationBarTitleDisplayMode(.large)
-                .toolbar {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        Spacer()
-                        
-                        Text("\(sortedLeaves.count) Pictures")
-                            .font(.footnote)
-                            .foregroundColor(Color(hex:"428D6D"))
-                        Spacer()
-                        
-                        NavigationLink(destination: CameraRulesView(namePot: pot?.namePot ?? "")) {
-                            Image(systemName: "camera")
-                                .foregroundStyle(Color(hex: "428D6D"))
-                        }
-                    }
-                }
+                
                 .background(LeaFitColors.background.ignoresSafeArea())
             } else {
                 VStack {
@@ -161,7 +147,7 @@ struct JournalView: View {
                     Text("Start taking your pictures here!")
                         .font(.subheadline)
                         .foregroundColor(.gray)
-                    NavigationLink (destination: CameraView()){
+                    NavigationLink (destination: CameraView(namePot: pot?.namePot ?? "Unknown")){
                         HStack (spacing: 2){
                             Image(systemName: "camera.fill")
                                 .foregroundColor(Color(hex: "428D6D"))
@@ -183,6 +169,21 @@ struct JournalView: View {
                 
             }
             
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .bottomBar) {
+                Spacer()
+                
+                Text("\(sortedLeaves.count) Pictures")
+                    .font(.footnote)
+                    .foregroundColor(Color(hex:"428D6D"))
+                Spacer()
+                
+                NavigationLink(destination: CameraRulesView(namePot: pot?.namePot ?? "")) {
+                    Image(systemName: "camera")
+                        .foregroundStyle(Color(hex: "428D6D"))
+                }
+            }
         }
         
         .scrollContentBackground(.hidden)

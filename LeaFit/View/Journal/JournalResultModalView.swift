@@ -127,7 +127,7 @@ struct ImageSectionView: View {
                     VStack (alignment: .leading){
                         HStack(spacing: 5) {
                             OriginalImageView(image: originalImage, onTap: onImageTap)
-                            ProcessedImageView(image: processedImage, onTap: onImageTap)
+                            ProcessedImageView(image: processedImage, maskImage: maskImage, onTap: onImageTap)
                         }
                         VStack(alignment: .leading){
                             HStack(spacing: 0) {

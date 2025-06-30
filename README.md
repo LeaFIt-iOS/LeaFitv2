@@ -1,6 +1,6 @@
-# 🌱 LeaFit – Your Smart Plant Health Companion 🍃
+# 🌱 LeaFit 🍃
 
-Welcome to **LeaFit**, the all-in-one plant care assistant powered by machine learning 🌾💚  
+**LeaFit**, the all-in-one plant care assistant powered by machine learning 🌾💚  
 Keep your green plants healthy, happy, and thriving with just a few taps! 📱✨
 
 ---
@@ -33,8 +33,8 @@ Keep your green plants healthy, happy, and thriving with just a few taps! 📱�
 
 ## 🧠 Tech Under the Leaves
 
-LeaFit uses cutting-edge **Vision-based Machine Learning** 🌐  
-It analyzes leaf shape, color, and patterns to detect signs of common plant diseases such as:
+LeaFit uses **Vision-based Machine Learning** 🌐  
+It analyzes leaf shape, color, and patterns to detect signs of common plant diseases e.g (Aloe Vera):
 
 - 🍂 Rust
 - 🍁 Rot
